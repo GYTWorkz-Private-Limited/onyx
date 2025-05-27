@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "onyx_pulse_session_handling"
+version = "0.1.0"
+description = ""
+authors = ["Deva Macha deva.macha@gytworkz.com"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api" 

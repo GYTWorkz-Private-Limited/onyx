@@ -1,0 +1,1 @@
+Serivces that mostly interact with external system like DB, Queues, etc

@@ -1,0 +1,1 @@
+Used for storing Request, Response Schemas - for APIs etc
