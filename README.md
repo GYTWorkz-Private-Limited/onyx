@@ -18,6 +18,14 @@ Welcome! To contribute to the Pulse project, please follow these guidelines:
   - WebSocket connections (using FastAPI)
   Include appropriate API documentation and examples in the feature's README.
 
+  **Important:**  
+  To ensure smooth integration of multiple features:
+  - Use unique, descriptive folder names within each submodule
+  - Avoid using common prefixes in the folder names
+  - Follow consistent naming conventions
+
+
+
 
 - **General Tips:**  
   - Write clear, maintainable code.
