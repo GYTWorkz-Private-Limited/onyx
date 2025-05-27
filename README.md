@@ -1,31 +1,20 @@
-# Onyx
+# Pulse Contribution Guidelines
 
-A Python project managed with Poetry.
+Welcome! To contribute to the Pulse project, please follow these guidelines:
 
-## Installation
+- **Feature Organization:**  
+  Each feature from the development board should be placed in its own subfolder under the `pulse` directory.  
+  For example: `pulse/session_management`
 
-This project uses Poetry for dependency management. To get started:
+- **Project Structure:**  
+  Every `pulse` subfolder should follow the structure provided in `pulse/skeleton`.
 
-1. Install Poetry if you haven't already:
-   ```bash
-   curl -sSL https://install.python-poetry.org | python3 -
-   ```
+- **Dependency Management:**  
+  Use [Poetry](https://python-poetry.org/) to manage dependencies for each submodule.  
+  Ensure that each submodule has its own `pyproject.toml` file.
 
-2. Install dependencies:
-   ```bash
-   poetry install
-   ```
+- **General Tips:**  
+  - Write clear, maintainable code.
+  - Update documentation as needed.
 
-## Development
-
-To activate the virtual environment:
-```bash
-poetry shell
-```
-
-## Testing
-
-Run tests using pytest:
-```bash
-poetry run pytest
-``` 
+Thank you for helping make Pulse better!
