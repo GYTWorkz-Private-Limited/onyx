@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from controllers.upload_controller import router as upload_router
+from api.routes import router as upload_router
 from config.settings import settings
 from utils.logger import get_logger
 

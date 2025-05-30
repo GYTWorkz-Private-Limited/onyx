@@ -1,33 +1,49 @@
-# S3 Upload Service - Modular Architecture
+# DataUpload - S3 Bucket Upload Service
 
-A modular, production-ready FastAPI service for uploading files to Amazon S3 with concurrent processing capabilities.
+A modular, production-ready FastAPI service for uploading files to Amazon S3 with concurrent processing capabilities. This service is part of the Pulse project ecosystem and follows the established modular architecture patterns with separated API and controller layers.
 
 ## 🏗️ Architecture
 
-The service follows a clean, modular architecture:
+The service follows the Pulse project's modular architecture with clean separation of concerns:
 
 ```
-DataUpload/
-├── controllers/          # API endpoints and request handling
+S3Bucket/
+├── api/                 # API routes and endpoint definitions
 │   ├── __init__.py
-│   └── upload_controller.py
-├── services/            # Business logic
+│   └── routes.py        # FastAPI route definitions
+├── controllers/         # Request handling and business logic coordination
 │   ├── __init__.py
-│   └── s3_upload_service.py
-├── models/              # Pydantic models
+│   └── upload_controller.py  # Upload business logic
+├── services/            # Core business logic
+│   └── s3_upload_service.py  # S3 operations and file handling
+├── models/              # Pydantic data models and schemas
 │   ├── __init__.py
-│   └── upload_models.py
-├── utils/               # Utility functions
-│   ├── __init__.py
-│   ├── logger.py
-│   └── validators.py
+│   └── upload_models.py # Upload request/response models
+├── utils/               # Utility functions and helpers
+│   ├── logger.py        # Logging configuration
+│   └── validators.py    # File validation utilities
 ├── config/              # Configuration management
-│   ├── __init__.py
-│   └── settings.py
+│   └── settings.py      # Environment-based settings
+├── datafolder/          # Sample data files for testing
 ├── server.py            # Main FastAPI application
-├── requirements.txt     # Dependencies
-└── README.md           # This file
+├── pyproject.toml       # Poetry dependency management
+├── poetry.lock          # Poetry lock file
+└── README.md           # This documentation
 ```
+
+### Architecture Principles
+- **Modular Design**: Each component has a single responsibility
+- **API/Controller Separation**: Clean separation between API routes and business logic
+- **Service Layer**: Encapsulated business logic in dedicated service classes
+- **Configuration Management**: Centralized settings with environment variable support
+- **Poetry Integration**: Modern Python dependency management following Pulse guidelines
+
+### 🔄 Separation of Concerns
+- **API Layer** (`api/routes.py`): Handles HTTP requests/responses and route definitions
+- **Controller Layer** (`controllers/`): Contains business logic and orchestrates services
+- **Service Layer** (`services/`): Core S3 operations and file handling
+- **Models Layer** (`models/`): Data validation and response schemas
+- **Utils Layer** (`utils/`): Reusable utilities and validation functions
 
 ## ✨ Features
 
@@ -41,12 +57,29 @@ DataUpload/
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Install Dependencies with Poetry
+Following Pulse project guidelines, this service uses Poetry for dependency management:
+
 ```bash
-pip install -r requirements.txt
+# Install Poetry if not already installed
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Navigate to the S3Bucket directory
+cd onyx/pulse/DataUpload/S3Bucket
+
+# Install project dependencies
+poetry install
+
+# Activate the virtual environment
+poetry shell
 ```
 
-### 2. Environment Configuration
+**Alternative: Using pip (not recommended)**
+```bash
+pip install -r requirements.txt  # If requirements.txt exists
+```
+
+### 3. Environment Configuration
 Create a `.env` file:
 ```env
 # AWS Configuration
@@ -67,14 +100,33 @@ LOG_LEVEL=INFO
 ```
 
 ### 3. Run the Service
+
+**Using Poetry (recommended):**
+```bash
+# Run with Poetry
+poetry run python server.py
+
+# Or activate the environment first
+poetry shell
+python server.py
+```
+
+**Using Poetry scripts (if configured):**
+```bash
+poetry run start-server
+```
+
+**Direct execution:**
 ```bash
 python server.py
 ```
 
 The service will be available at:
 - **API**: http://localhost:8889
-- **Documentation**: http://localhost:8889/docs
-- **Health Check**: http://localhost:8889/api/v1/health
+- **Documentation**: http://localhost:8889/docs (Swagger UI)
+- **ReDoc**: http://localhost:8889/redoc (Alternative documentation)
+- **Health Check**: http://localhost:8889/upload/health
+- **Service Info**: http://localhost:8889/
 
 ## 📚 API Endpoints
 
@@ -82,17 +134,19 @@ The service will be available at:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/` | Service information |
+| GET | `/` | Service information and available endpoints |
 | GET | `/ping` | Simple connectivity test |
-| GET | `/api/v1/health` | Health check with S3 connectivity |
-| GET | `/api/v1/config` | Current upload configuration |
+| GET | `/upload/health` | Health check with S3 connectivity |
 
 ### Upload Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/upload` | Upload multiple files |
-| POST | `/api/v1/upload/single` | Upload single file |
+| POST | `/upload/` | Upload multiple files to S3 |
+
+### API Documentation
+- **Interactive Docs**: http://localhost:8889/docs (Swagger UI)
+- **ReDoc**: http://localhost:8889/redoc (Alternative documentation)
 
 ### Upload Request
 
@@ -127,7 +181,7 @@ The service will be available at:
 
 ### Upload Multiple Files
 ```bash
-curl -X POST "http://localhost:8889/api/v1/upload" \
+curl -X POST "http://localhost:8889/upload/" \
   -F "files=@document1.pdf" \
   -F "files=@image.jpg" \
   -F "files=@data.csv" \
@@ -137,12 +191,36 @@ curl -X POST "http://localhost:8889/api/v1/upload" \
 
 ### Health Check
 ```bash
-curl http://localhost:8889/api/v1/health
+curl http://localhost:8889/upload/health
 ```
 
-### Get Configuration
+### Service Information
 ```bash
-curl http://localhost:8889/api/v1/config
+curl http://localhost:8889/
+```
+
+### Using Poetry for Development
+```bash
+# Run tests (when implemented)
+poetry run pytest
+
+# Run tests with coverage
+poetry run pytest --cov=.
+
+# Format code (if black is added)
+poetry run black .
+
+# Lint code (if flake8 is added)
+poetry run flake8
+
+# Add new dependency
+poetry add package-name
+
+# Add development dependency
+poetry add --group dev package-name
+
+# Update dependencies
+poetry update
 ```
 
 ## ⚙️ Configuration
@@ -165,25 +243,151 @@ curl http://localhost:8889/api/v1/config
 
 ## 🏃‍♂️ Running in Production
 
-### Using Gunicorn
+### Using Gunicorn with Poetry
 ```bash
-pip install gunicorn
-gunicorn server:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8889
+# Install gunicorn as a dev dependency
+poetry add --group dev gunicorn
+
+# Run with Gunicorn
+poetry run gunicorn server:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8889
 ```
 
-### Using Docker
+### Using Docker with Poetry
 ```dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
+
+# Install Poetry
+RUN pip install poetry
+
+# Set working directory
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+
+# Copy Poetry files
+COPY pyproject.toml poetry.lock ./
+
+# Configure Poetry: Don't create virtual environment (we're in a container)
+RUN poetry config virtualenvs.create false
+
+# Install dependencies
+RUN poetry install --only=main
+
+# Copy application code
 COPY . .
-CMD ["python", "server.py"]
+
+# Expose port
+EXPOSE 8889
+
+# Run the application
+CMD ["poetry", "run", "python", "server.py"]
+```
+
+### Using systemd (Linux) with Poetry
+```ini
+[Unit]
+Description=S3 Upload Service
+After=network.target
+
+[Service]
+Type=simple
+User=app
+WorkingDirectory=/app
+Environment=PATH=/app/.venv/bin
+ExecStart=/usr/local/bin/poetry run python server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Alternative: Export requirements.txt for Docker
+```bash
+# Export dependencies to requirements.txt for Docker builds
+poetry export -f requirements.txt --output requirements.txt --without-hashes
 ```
 
 ## 🧪 Testing
 
-The service includes comprehensive validation and error handling. Test with various file types and sizes to ensure proper operation.
+### Unit Tests with Poetry
+```bash
+# Run tests
+poetry run pytest
+
+# Run tests with coverage
+poetry run pytest --cov=.
+
+# Run specific test file
+poetry run pytest tests/test_upload.py
+
+# Run tests in verbose mode
+poetry run pytest -v
+```
+
+### Manual Testing
+```bash
+# Test health endpoint
+curl http://localhost:8889/upload/health
+
+# Test upload functionality with sample files
+curl -X POST "http://localhost:8889/upload/" \
+  -F "files=@datafolder/sample.pdf" \
+  -F "files=@datafolder/image.jpg" \
+  -F "project_name=test-project" \
+  -F "s3_prefix=uploads"
+
+# Test service info
+curl http://localhost:8889/
+```
+
+### Development Testing
+```bash
+# Install development dependencies
+poetry install
+
+# Run linting (if flake8 is added)
+poetry run flake8
+
+# Format code (if black is added)
+poetry run black .
+
+# Type checking (if mypy is added)
+poetry run mypy .
+```
+
+### Development Dependencies
+The project includes development dependencies for testing:
+- `pytest`: Testing framework
+- `pytest-asyncio`: Async testing support
+- `httpx`: HTTP client for testing API endpoints
+
+## 🛠️ Development Workflow
+
+### Adding New Dependencies
+```bash
+# Add production dependency
+poetry add package-name
+
+# Add development dependency
+poetry add --group dev package-name
+
+# Update dependencies
+poetry update
+
+# Show dependency tree
+poetry show --tree
+```
+
+### Code Structure Guidelines
+- **Routes** (`api/routes.py`): Keep route definitions clean, delegate to controllers
+- **Controllers** (`controllers/`): Handle business logic, orchestrate services
+- **Services** (`services/`): Core functionality, reusable business operations
+- **Models** (`models/`): Data validation and serialization
+- **Utils** (`utils/`): Helper functions and utilities
+
+### Sample Data
+The `datafolder/` contains sample files for testing:
+- Various file formats (PDF, DOCX, CSV, JSON, images, etc.)
+- Use these files to test upload functionality
+- Validate different file types and sizes
 
 ## 📝 Logging
 
@@ -195,8 +399,66 @@ The service provides structured logging with:
 
 ## 🔒 Security Considerations
 
-- Validate file types and sizes
-- Sanitize filenames
-- Use IAM roles with minimal S3 permissions
-- Configure CORS appropriately for production
-- Consider rate limiting for public deployments
+- **File Validation**: Validate file types and sizes before upload
+- **Filename Sanitization**: Sanitize filenames to prevent path traversal
+- **IAM Permissions**: Use IAM roles with minimal S3 permissions
+- **CORS Configuration**: Configure CORS appropriately for production
+- **Rate Limiting**: Consider implementing rate limiting for public deployments
+- **Access Control**: Implement authentication for production deployments
+- **Network Security**: Configure appropriate firewall rules
+
+## 🚀 Integration with Pulse Project
+
+This service is designed to integrate seamlessly with the Pulse project ecosystem:
+
+### Pulse Architecture Compliance
+- **Modular Structure**: Follows the established Pulse modular architecture
+- **Poetry Integration**: Uses Poetry for dependency management as per Pulse guidelines
+- **API Standards**: Implements FastAPI with consistent endpoint patterns
+- **Configuration Management**: Environment-based configuration following Pulse patterns
+
+### Team-Friendly Usage
+This connector provides simple, team-friendly integration for development teams:
+
+```python
+# Example integration in client applications
+import requests
+import os
+
+# Health check
+response = requests.get("http://localhost:8889/upload/health")
+print(response.json())
+
+# Upload files
+files = [
+    ('files', ('document.pdf', open('document.pdf', 'rb'), 'application/pdf')),
+    ('files', ('image.jpg', open('image.jpg', 'rb'), 'image/jpeg'))
+]
+data = {
+    'project_name': 'my-project',
+    's3_prefix': 'uploads/batch1'
+}
+
+response = requests.post("http://localhost:8889/upload/", files=files, data=data)
+print(response.json())
+
+# Close file handles
+for _, (_, file_obj, _) in files:
+    file_obj.close()
+```
+
+### Development Team Guidelines
+1. **Environment Setup**: Use Poetry for consistent dependency management
+2. **Testing**: Run tests before committing changes using sample data in `datafolder/`
+3. **Code Quality**: Use provided linting and formatting tools
+4. **Documentation**: Update README when adding new features
+5. **API Design**: Follow existing endpoint patterns for consistency
+
+## 🎯 Benefits of This Architecture
+
+- **Concurrent Processing**: Optimized batch uploads with configurable concurrency
+- **Comprehensive Validation**: File size, type, and naming validation
+- **Simplified Maintenance**: Clean modular structure reduces bugs
+- **Team Collaboration**: Consistent patterns across Pulse project
+- **Easy Integration**: Simple API for client/backend applications
+- **Sample Data Ready**: Includes test files for immediate development
