@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from controllers.sync_controller import router as sync_router
+from api.routes import router as sync_router
 from services.s3_sync_service import S3SyncService
 from config.settings import settings
 from utils.logger import get_logger

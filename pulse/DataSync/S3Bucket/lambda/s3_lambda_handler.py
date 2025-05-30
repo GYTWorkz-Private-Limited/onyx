@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-API_ENDPOINT = os.environ.get("API_ENDPOINT", "http://localhost:8888")
+API_ENDPOINT = os.environ.get("API_ENDPOINT", "https://whatever-midwest-jury-duties.trycloudflare.com")
 
 
 def lambda_handler(event, _):
