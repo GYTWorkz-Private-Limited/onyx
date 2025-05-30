@@ -1,0 +1,4 @@
+{
+  "sales": ["revenue", "sale_date", "customer_id"],
+  "users": ["id", "name", "email"]
+} 

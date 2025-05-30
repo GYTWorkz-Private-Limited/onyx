@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Monthly Revenue Growth",
+    "description": "Growth in revenue month over month",
+    "formula": "SELECT SUM(revenue) FROM sales",
+    "created_by": "dummy_user",
+    "created_at": "2025-05-30T06:04:35.399232"
+  },
+  {
+    "name": "Monthly Revenue",
+    "description": "Growth in revenue month over month",
+    "formula": "SELECT SUM(revenue) FROM sales",
+    "created_by": "dummy_user",
+    "created_at": "2025-05-30T06:06:51.981540"
+  }
+]
