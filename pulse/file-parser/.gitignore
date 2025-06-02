@@ -156,3 +156,9 @@ logs/
 .env
 *.key
 *.pem
+
+# Test files (ignoring as requested)
+tests/
+**/tests/
+test_*.py
+*_test.py

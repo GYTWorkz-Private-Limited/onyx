@@ -38,26 +38,19 @@ file-parser/
 ├── schemas/                # Pydantic schemas
 │   ├── __init__.py
 │   └── parse_schemas.py    # Request/response schemas
-├── tools/                  # Utility tools
-│   ├── __init__.py
-│   ├── file_validator.py   # File validation utilities
-│   └── output_writer.py    # Output writing utilities
 ├── utils/                  # General utilities
 │   ├── __init__.py
 │   ├── constants.py        # Application constants
-│   └── logging_config.py   # Logging configuration
-├── tests/                  # Test suite
-│   ├── __init__.py
-│   ├── conftest.py        # Test configuration
-│   ├── test_api.py        # API tests
-│   └── test_services.py   # Service tests
+│   ├── file_validator.py   # File validation utilities
+│   ├── logging_config.py   # Logging configuration
+│   └── output_writer.py    # Output writing utilities
 ├── output/                 # Generated output files
 ├── temp/                   # Temporary files (auto-created)
 ├── logs/                   # Application logs
 ├── environment.py          # Environment configuration
 ├── server.py              # FastAPI application setup
-├── pyproject.toml         # Modern Python project config
-├── requirements.txt       # Dependencies (legacy)
+├── pyproject.toml         # Poetry project configuration
+├── poetry.lock           # Poetry lock file (auto-generated)
 └── README.md             # This file
 ```
 
@@ -81,12 +74,16 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 ### 3. Install Dependencies
 
-**Option A: Using pip (legacy)**
+**Using Poetry (recommended)**
 ```bash
-pip install -r requirements.txt
+# Install Poetry if you haven't already
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Install project dependencies
+poetry install
 ```
 
-**Option B: Using pip with pyproject.toml (recommended)**
+**Alternative: Using pip with pyproject.toml**
 ```bash
 pip install -e .
 ```
@@ -119,19 +116,19 @@ MAX_FILE_SIZE=50000000
 ### Development Mode
 
 ```bash
-uvicorn server:app --reload
+poetry run uvicorn server:app --reload
 ```
 
 ### Production Mode
 
 ```bash
-uvicorn server:app --host 0.0.0.0 --port 8000
+poetry run uvicorn server:app --host 0.0.0.0 --port 8000
 ```
 
 ### Using Python directly
 
 ```bash
-python server.py
+poetry run python server.py
 ```
 
 ### Using Makefile
@@ -193,19 +190,23 @@ output/
 
 ```bash
 # Install development dependencies
-pip install -e ".[dev]"
+poetry install
 
 # Format code
 make format
+# or directly: poetry run black . && poetry run isort .
 
 # Lint code
 make lint
+# or directly: poetry run flake8 . && poetry run mypy .
 
 # Run tests
 make test
+# or directly: poetry run pytest tests/ -v
 
 # Run tests with coverage
 make test-coverage
+# or directly: poetry run pytest tests/ -v --cov=. --cov-report=html --cov-report=term
 
 # Check everything
 make check

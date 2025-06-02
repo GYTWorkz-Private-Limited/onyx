@@ -32,10 +32,10 @@ async def parse_file(
 ) -> JSONResponse:
     """
     Parse an uploaded file and return extracted text and markdown.
-    
+
     - **file**: Upload a supported document file
     - **engine**: Choose between 'docling' (open-source) or 'llama' (cloud-based)
-    
+
     Returns parsed content with previews and output file paths.
     """
     try:
@@ -55,7 +55,7 @@ async def parse_file(
 async def get_supported_engines() -> Dict[str, Any]:
     """
     Get information about supported parser engines.
-    
+
     Returns details about available engines, supported formats, and configuration status.
     """
     try:
@@ -72,7 +72,7 @@ async def get_supported_engines() -> Dict[str, Any]:
 async def health_check() -> Dict[str, str]:
     """
     Health check endpoint.
-    
+
     Returns the status of the parsing service.
     """
     return {
@@ -80,3 +80,6 @@ async def health_check() -> Dict[str, str]:
         "service": "File Parser API",
         "version": "1.0.0"
     }
+
+
+

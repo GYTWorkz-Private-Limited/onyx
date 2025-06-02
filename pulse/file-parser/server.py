@@ -8,9 +8,16 @@ import uvicorn
 import logging
 import nest_asyncio
 
-from api.parse_routes import router as parse_router
+try:
+    from api.parse_routes import router as parse_router
+    PARSE_ROUTES_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Parse routes not available: {e}")
+    PARSE_ROUTES_AVAILABLE = False
+    parse_router = None
+
 from environment import Environment
-from tools.output_writer import OutputWriter
+from utils.output_writer import OutputWriter
 from utils.logging_config import setup_logging, get_logger
 
 # Apply nest_asyncio to allow nested event loops (fixes LlamaParse async issues)
@@ -26,6 +33,8 @@ async def lifespan(app: FastAPI):
     logger.info(f"📁 Output directory: {Environment.get_output_dir()}")
     logger.info(f"📁 Temp directory: {Environment.get_temp_dir()}")
     logger.info(f"🔑 LlamaParse configured: {Environment.validate_llama_config()}")
+    logger.info(f"🌐 Server will be available at: http://{Environment.HOST}:{Environment.PORT}")
+    logger.info(f"📚 API Documentation: http://localhost:{Environment.PORT}/docs")
 
     yield
 
@@ -58,8 +67,14 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Include routers
-    app.include_router(parse_router)
+    # Include routers if available
+    if PARSE_ROUTES_AVAILABLE and parse_router:
+        app.include_router(parse_router)
+    else:
+        # Add basic health endpoint if parse routes are not available
+        @app.get("/health")
+        async def health():
+            return {"status": "healthy", "message": "Basic server running without parse routes"}
 
     # Ensure output directory exists
     OutputWriter.ensure_output_directory()
@@ -86,6 +101,6 @@ if __name__ == "__main__":
         "server:app",
         host=Environment.HOST,
         port=Environment.PORT,
-        reload=Environment.DEBUG,
-        log_level="info"
+        reload=False,
+        log_level="warning"
     )
