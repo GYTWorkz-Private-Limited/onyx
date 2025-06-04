@@ -101,6 +101,6 @@ if __name__ == "__main__":
         "server:app",
         host=Environment.HOST,
         port=Environment.PORT,
-        reload=False,
-        log_level="warning"
+        reload=False,  # Disable auto-reload to remove watchfiles logs
+        log_level="warning"  # Changed from "info" to hide watchfiles logs
     )

@@ -1,242 +1,140 @@
-# 📄 File Parser API (Docling & LLaMAParse)
+# File Parser API
 
-A modular, production-ready FastAPI service that parses uploaded documents using either **Docling** or **LlamaParse**, returning both **plain text** and **Markdown** formats.
+A FastAPI service for parsing documents using Docling (open-source) or LlamaParse (cloud-based) engines. Extracts text and markdown from PDF, DOCX, CSV, XLSX, and PPTX files.
 
----
+## Features
 
-## ✅ Features
+- **Multiple Parser Engines**: Choose between Docling (free) or LlamaParse (requires API key)
+- **Format Support**: PDF, DOCX, CSV, XLSX, PPTX
+- **Dual Output**: Plain text and Markdown formats
+- **REST API**: Well-documented endpoints with Swagger UI
+- **File Validation**: Size limits and format checking
 
-- **Modular Architecture**: Clean separation of concerns with organized folder structure
-- **Multiple Parser Engines**: Choose between `docling` (open-source) or `llama` (cloud-based)
-- **Wide Format Support**: `.pdf`, `.docx`, `.csv`, `.xlsx`, `.pptx`
-- **Dual Output**: Plain text (`.txt`) and Markdown (`.md`) formats
-- **RESTful API**: Well-documented endpoints with OpenAPI/Swagger
-- **Type Safety**: Full Pydantic schema validation
-- **Error Handling**: Comprehensive error handling and validation
-- **Environment Configuration**: Flexible configuration via environment variables
+## Quick Start
 
----
-
-## 🏗️ Project Structure
-
-```
-file-parser/
-├── api/                    # API routes and endpoints
-│   ├── __init__.py
-│   └── parse_routes.py     # Parse endpoint routes
-├── controllers/            # Business logic controllers
-│   ├── __init__.py
-│   └── parse_controller.py # Parse operations controller
-├── models/                 # Data models and schemas
-│   ├── __init__.py
-│   └── parse_models.py     # Parse result models
-├── services/               # Core parsing services
-│   ├── __init__.py
-│   ├── base_parser.py      # Abstract base parser
-│   ├── docling_service.py  # Docling parsing service
-│   └── llamaparse_service.py # LlamaParse service
-├── schemas/                # Pydantic schemas
-│   ├── __init__.py
-│   └── parse_schemas.py    # Request/response schemas
-├── utils/                  # General utilities
-│   ├── __init__.py
-│   ├── constants.py        # Application constants
-│   ├── file_validator.py   # File validation utilities
-│   ├── logging_config.py   # Logging configuration
-│   └── output_writer.py    # Output writing utilities
-├── output/                 # Generated output files
-├── temp/                   # Temporary files (auto-created)
-├── logs/                   # Application logs
-├── environment.py          # Environment configuration
-├── server.py              # FastAPI application setup
-├── pyproject.toml         # Poetry project configuration
-├── poetry.lock           # Poetry lock file (auto-generated)
-└── README.md             # This file
-```
-
----
-
-## 🛠 Setup
-
-### 1. Clone and Navigate
+### 1. Installation
 
 ```bash
+# Clone the repository
 git clone <your-repo-url>
 cd file-parser
-```
 
-### 2. Create Virtual Environment
-
-```bash
+# Create virtual environment
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-### 3. Install Dependencies
-
-**Using Poetry (recommended)**
-```bash
-# Install Poetry if you haven't already
-curl -sSL https://install.python-poetry.org | python3 -
-
-# Install project dependencies
-poetry install
-```
-
-**Alternative: Using pip with pyproject.toml**
-```bash
+# Install dependencies
 pip install -e .
 ```
 
-### 4. Environment Configuration
+### 2. Configuration
 
-Create a `.env` file in the project root:
+Copy `.env.example` to `.env` and configure:
 
 ```env
-# LlamaParse Configuration
-LLAMA_CLOUD_API_KEY=llx-<your-key>
+# LlamaParse Configuration (optional - for cloud parsing)
+LLAMA_CLOUD_API_KEY=your-api-key-here
 PARSER_MODE=balanced
 OUTPUT_FORMAT=markdown
 
 # Application Configuration
-OUTPUT_DIR=output
-TEMP_DIR=temp
-HOST=0.0.0.0
+HOST=127.0.0.1
 PORT=8000
-DEBUG=false
-
-# File Processing
+DEBUG=true
 MAX_FILE_SIZE=50000000
 ```
 
----
+**Getting a LlamaParse API Key:**
+1. Visit [LlamaIndex Cloud](https://cloud.llamaindex.ai/)
+2. Sign up for an account
+3. Generate an API key
+4. Add it to your `.env` file
 
-## 🚀 Running the Application
-
-### Development Mode
-
-```bash
-poetry run uvicorn server:app --reload
-```
-
-### Production Mode
+### 3. Run the Server
 
 ```bash
-poetry run uvicorn server:app --host 0.0.0.0 --port 8000
+python server.py
 ```
 
-### Using Python directly
+The API will be available at `http://localhost:8000` with documentation at `http://localhost:8000/docs`.
 
-```bash
-poetry run python server.py
-```
-
-### Using Makefile
-
-```bash
-make run          # Development mode
-make run-prod     # Production mode
-```
-
-Open your browser at: [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-## 📚 API Documentation
+## API Usage
 
 ### Endpoints
 
 - **POST `/api/v1/parse/`** - Parse uploaded file
 - **GET `/api/v1/engines/`** - Get supported parser engines
-- **GET `/api/v1/health/`** - Health check
 - **GET `/docs`** - Interactive API documentation
-- **GET `/redoc`** - Alternative API documentation
 
-### Example Usage
+### Parse a Document
 
+**Using curl:**
 ```bash
-# Using curl (Linux/Mac)
 curl -X POST "http://localhost:8000/api/v1/parse/" \
-     -H "accept: application/json" \
      -H "Content-Type: multipart/form-data" \
      -F "file=@document.pdf" \
-     -F "engine=llama"
-
-# Using PowerShell (Windows)
-$form = @{
-    file = Get-Item "document.pdf"
-    engine = "llama"
-}
-Invoke-RestMethod -Uri "http://localhost:8000/api/v1/parse/" -Method Post -Form $form
+     -F "engine=docling"
 ```
 
----
+**Using Python requests:**
+```python
+import requests
 
-## 📂 Output Structure
+with open("document.pdf", "rb") as f:
+    response = requests.post(
+        "http://localhost:8000/api/v1/parse/",
+        files={"file": f},
+        data={"engine": "docling"}
+    )
+print(response.json())
+```
 
-For a file named `invoice.pdf`, you'll get:
+### Parser Engines
+
+- **`docling`** - Free, open-source parser (no API key required)
+- **`llama`** - Cloud-based LlamaParse (requires API key, higher accuracy)
+
+### Output Files
+
+Parsed files are saved to the `output/` directory:
+- `filename.txt` - Plain text extraction
+- `filename.md` - Markdown formatted extraction
+
+## Project Structure
 
 ```
-output/
-├── invoice.txt      # Plain text extraction
-└── invoice.md       # Markdown formatted extraction
+file-parser/
+├── api/                    # API routes
+├── controllers/            # Business logic
+├── services/               # Parser implementations
+├── models/                 # Data models
+├── schemas/                # API schemas
+├── utils/                  # Utilities
+├── output/                 # Generated files
+├── server.py              # Main application
+└── environment.py         # Configuration
 ```
 
----
+## Troubleshooting
 
-## 🔧 Development
-
-### Code Quality Tools
-
+**Port already in use:**
 ```bash
-# Install development dependencies
-poetry install
-
-# Format code
-make format
-# or directly: poetry run black . && poetry run isort .
-
-# Lint code
-make lint
-# or directly: poetry run flake8 . && poetry run mypy .
-
-# Run tests
-make test
-# or directly: poetry run pytest tests/ -v
-
-# Run tests with coverage
-make test-coverage
-# or directly: poetry run pytest tests/ -v --cov=. --cov-report=html --cov-report=term
-
-# Check everything
-make check
+# Find process using port 8000
+netstat -ano | findstr :8000
+# Kill the process (replace PID)
+taskkill /PID <PID> /F
 ```
 
-### Adding New Parser Engines
+**LlamaParse authentication error:**
+- Verify your API key is correct in `.env`
+- Check your LlamaIndex Cloud account status
+- Use `docling` engine as fallback (no API key required)
 
-1. Create a new service in `services/` inheriting from `BaseParser`
-2. Implement the required abstract methods
-3. Add the engine to `ParserEngine` enum in `schemas/parse_schemas.py`
-4. Update the controller to handle the new engine
+**File parsing fails:**
+- Check file size (default limit: 50MB)
+- Verify file format is supported
+- Try the alternative parser engine
 
----
-
-## 📝 License
+## License
 
 MIT License - see LICENSE file for details.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
----
-
-## 📞 Support
-
-For issues and questions, please open an issue on GitHub.
