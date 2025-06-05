@@ -61,13 +61,31 @@ class FileValidator:
     
     @staticmethod
     def cleanup_temp_file(temp_path: str) -> None:
-        """Clean up temporary file."""
-        try:
-            if os.path.exists(temp_path):
+        """Clean up temporary file with robust error handling."""
+        import time
+        import gc
+
+        if not os.path.exists(temp_path):
+            return
+
+        # Force garbage collection to close any lingering file handles
+        gc.collect()
+
+        # Try multiple times with increasing delays for Windows file locking issues
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            try:
                 os.remove(temp_path)
-        except OSError as e:
-            # Log the error but don't raise it
-            print(f"Warning: Could not remove temporary file {temp_path}: {e}")
+                return  # Success!
+            except OSError as e:
+                if attempt < max_attempts - 1:
+                    # Wait a bit and try again (Windows file locking can be delayed)
+                    time.sleep(0.1 * (attempt + 1))  # 0.1s, 0.2s, 0.3s, 0.4s
+                    continue
+                else:
+                    # Final attempt failed, log the error but don't raise it
+                    print(f"Warning: Could not remove temporary file {temp_path}: {e}")
+                    print(f"         File will be cleaned up on next server restart or manual cleanup")
     
     @staticmethod
     def validate_and_raise(file: UploadFile) -> None:

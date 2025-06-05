@@ -98,39 +98,29 @@ class LlamaParseService(BaseParser):
         nest_asyncio.apply()
 
         try:
-            # Debug information
             import os
-            file_size = os.path.getsize(file_path)
             file_ext = os.path.splitext(file_path)[1].lower()
-            print(f"DEBUG: LlamaParse processing {file_ext} file, size: {file_size} bytes")
 
             # Additional integrity check for Office documents
             if file_ext in ['.docx', '.xlsx', '.pptx']:
-                print(f"DEBUG: Performing integrity check for {file_ext}")
                 try:
                     with open(file_path, 'rb') as f:
                         header = f.read(4)
-                        if header[:2] == b'PK':
-                            print(f"DEBUG: Valid ZIP header found for {file_ext}")
-                        else:
-                            print(f"DEBUG: WARNING - Invalid header for {file_ext}: {header}")
+                        if header[:2] != b'PK':
                             # File might be corrupted, but let's try anyway
-                except Exception as e:
-                    print(f"DEBUG: Could not check file header: {e}")
+                            pass
+                except Exception:
+                    # Could not check file header, continue anyway
+                    pass
 
             # Use the load_data method which works reliably
             documents = self.parser.load_data(file_path)
 
-            print(f"DEBUG: LlamaParse returned {len(documents) if documents else 0} documents")
-
             if not documents or len(documents) == 0:
                 # Try alternative parsing approaches for problematic formats
                 if file_ext in ['.docx', '.pptx']:
-                    print(f"DEBUG: Attempting alternative parsing strategies for {file_ext}")
-
                     # Strategy 1: Try with different result type
                     try:
-                        print(f"DEBUG: Trying with text result type...")
                         alt_parser1 = LlamaParse(
                             api_key=Environment.LLAMA_CLOUD_API_KEY,
                             result_type="text",
@@ -138,17 +128,12 @@ class LlamaParseService(BaseParser):
                             language="en"
                         )
                         documents = alt_parser1.load_data(file_path)
-                        print(f"DEBUG: Text parser returned {len(documents) if documents else 0} documents")
-                        if documents and len(documents) > 0:
-                            print(f"DEBUG: Success with text result type!")
-                        else:
+                        if not documents or len(documents) == 0:
                             raise Exception("Still no documents")
-                    except Exception as alt_e1:
-                        print(f"DEBUG: Text parsing failed: {alt_e1}")
+                    except Exception:
 
                         # Strategy 2: Try copying file to new location
                         try:
-                            print(f"DEBUG: Trying with file copy...")
                             import shutil
                             import tempfile
 
@@ -158,11 +143,9 @@ class LlamaParseService(BaseParser):
 
                             # Copy the original file
                             shutil.copy2(file_path, tmp_path)
-                            print(f"DEBUG: Copied file to {tmp_path}")
 
                             # Try parsing the copy
                             documents = self.parser.load_data(tmp_path)
-                            print(f"DEBUG: Copy parser returned {len(documents) if documents else 0} documents")
 
                             # Clean up
                             try:
@@ -170,32 +153,26 @@ class LlamaParseService(BaseParser):
                             except:
                                 pass
 
-                            if documents and len(documents) > 0:
-                                print(f"DEBUG: Success with file copy!")
-                            else:
+                            if not documents or len(documents) == 0:
                                 raise Exception("Still no documents with copy")
 
-                        except Exception as alt_e2:
-                            print(f"DEBUG: Copy parsing failed: {alt_e2}")
+                        except Exception:
+                            pass
 
                 if not documents or len(documents) == 0:
                     raise RuntimeError(f"LlamaParse returned no documents for {file_ext} file after trying multiple strategies. This may be due to file format limitations, content issues, or API constraints.")
 
             # Extract text from documents
             text_parts = []
-            for i, doc in enumerate(documents):
-                print(f"DEBUG: Processing document {i+1}/{len(documents)}")
+            for doc in documents:
                 if hasattr(doc, 'text'):
                     content = doc.text
-                    print(f"DEBUG: Document {i+1} text length: {len(content) if content else 0}")
                     text_parts.append(content)
                 elif hasattr(doc, 'get_content'):
                     content = doc.get_content()
-                    print(f"DEBUG: Document {i+1} content length: {len(content) if content else 0}")
                     text_parts.append(content)
                 else:
                     content = str(doc)
-                    print(f"DEBUG: Document {i+1} string length: {len(content) if content else 0}")
                     text_parts.append(content)
 
             # Filter out empty parts
@@ -207,11 +184,9 @@ class LlamaParseService(BaseParser):
             text = "\n\n".join(text_parts)
             markdown = text  # LlamaParse already returns markdown format
 
-            print(f"DEBUG: Final text length: {len(text)}")
             return text, markdown
 
         except Exception as e:
-            print(f"DEBUG: LlamaParse exception: {type(e).__name__}: {e}")
             raise RuntimeError(f"LlamaParse failed: {str(e)}")
 
     def validate_configuration(self) -> bool:

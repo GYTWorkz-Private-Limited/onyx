@@ -169,7 +169,6 @@ class DoclingService(BaseParser):
 
         for i, file_path in enumerate(file_paths):
             try:
-                print(f"Processing batch item {i+1}/{len(file_paths)}: {Path(file_path).name}")
                 text_content, markdown_content = self.parse(file_path)
                 results.append((file_path, text_content, markdown_content))
 
@@ -178,7 +177,6 @@ class DoclingService(BaseParser):
                     self._cleanup_memory()
 
             except Exception as e:
-                print(f"Error processing {file_path}: {e}")
                 results.append((file_path, "", f"Error: {str(e)}"))
 
         return results
@@ -1045,32 +1043,365 @@ class DoclingService(BaseParser):
             raise RuntimeError(f"CSV parsing failed: {str(e)}")
 
     def _parse_excel(self, file_path: str) -> Tuple[str, str]:
-        """Parse Excel files with enhanced formatting and robust NaN handling."""
+        """Parse Excel files with enhanced multi-sheet support and better formatting."""
         try:
-            df = pd.read_excel(file_path)
+            # Use context manager to ensure file handle is properly closed
+            with pd.ExcelFile(file_path) as xl_file:
+                all_sheets_text = []
+                all_sheets_markdown = []
 
-            # Robust NaN cleaning: multiple approaches
-            # 1. Replace NaN with empty strings
-            df = df.fillna('')
+                for sheet_name in xl_file.sheet_names:
+                    # Parse individual sheet with enhanced formatting using the same xl_file object
+                    sheet_text, sheet_markdown = self._parse_excel_sheet_enhanced(xl_file, sheet_name)
 
-            # 2. Remove completely empty rows
-            df = df.dropna(how='all')
+                    # Add sheet headers
+                    sheet_header = f"\n{'='*60}\nSHEET: {sheet_name}\n{'='*60}\n"
+                    sheet_markdown_header = f"\n## Sheet: {sheet_name}\n\n"
 
-            # 3. Convert to string and clean any remaining 'nan' text
-            text_content = df.to_string(index=False, na_rep='')
-            markdown_content = df.to_markdown(index=False, tablefmt='pipe')
+                    all_sheets_text.append(sheet_header + sheet_text)
+                    all_sheets_markdown.append(sheet_markdown_header + sheet_markdown)
 
-            # 4. Post-process to remove any remaining 'nan' artifacts
-            text_content = self._clean_nan_artifacts(text_content)
-            markdown_content = self._clean_nan_artifacts(markdown_content)
+                # Combine all sheets
+                final_text = "\n\n".join(all_sheets_text)
+                final_markdown = "\n\n".join(all_sheets_markdown)
 
-            # Apply table structure fixes for consistent bold formatting
-            markdown_content = self._fix_table_structure(markdown_content)
+                # Apply minimal cleaning for Excel files (preserve structure)
+                # Only clean NaN artifacts without destroying line structure
+                final_text = self._clean_excel_nan_artifacts(final_text)
+                # Skip markdown cleaning to preserve perfect table structure
+                # final_markdown = self._clean_excel_nan_artifacts(final_markdown)
+
+                return final_text, final_markdown
+
+        except Exception as e:
+            raise RuntimeError(f"Enhanced Excel parsing failed: {str(e)}")
+
+    def _parse_excel_sheet_enhanced(self, xl_file: pd.ExcelFile, sheet_name: str) -> Tuple[str, str]:
+        """Parse individual Excel sheet with enhanced formatting and proper header detection."""
+        try:
+            # First, read without headers to analyze structure
+            df_raw = pd.read_excel(xl_file, sheet_name=sheet_name, header=None)
+
+            # Detect the actual header row
+            header_row_idx = self._detect_excel_header_row(df_raw)
+
+            if header_row_idx is not None:
+                # Read again with proper header
+                df = pd.read_excel(xl_file, sheet_name=sheet_name, header=header_row_idx)
+                # Clean column names
+                df.columns = self._clean_excel_column_names(df.columns)
+            else:
+                # No clear header found, use raw data
+                df = df_raw
+                df.columns = [f"Column_{i+1}" for i in range(len(df.columns))]
+
+            # Clean the dataframe
+            df = self._clean_excel_dataframe(df)
+
+            if df.empty:
+                return f"Sheet '{sheet_name}' is empty.", f"*Sheet '{sheet_name}' is empty.*"
+
+            # Generate enhanced text content
+            text_content = self._generate_excel_text_content(df, sheet_name)
+
+            # Generate enhanced markdown content with improved formatting
+            markdown_content = self._generate_excel_markdown_content_enhanced(df, sheet_name)
 
             return text_content, markdown_content
 
         except Exception as e:
-            raise RuntimeError(f"Excel parsing failed: {str(e)}")
+            error_msg = f"Failed to parse sheet '{sheet_name}': {str(e)}"
+            return error_msg, f"*{error_msg}*"
+
+    def _clean_excel_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Clean Excel dataframe by removing empty rows and columns."""
+        # Remove completely empty rows and columns
+        df = df.dropna(how='all').dropna(axis=1, how='all')
+
+        # Fill NaN with empty strings for better display
+        df = df.fillna('')
+
+        # Convert all to string for consistent handling
+        df = df.astype(str)
+
+        # Clean up 'nan' strings that might remain
+        df = df.replace('nan', '')
+
+        return df
+
+    def _generate_excel_text_content(self, df: pd.DataFrame, sheet_name: str) -> str:
+        """Generate well-formatted text content for Excel data."""
+        if df.empty:
+            return f"Sheet '{sheet_name}' contains no data."
+
+        lines = []
+
+        # Add sheet information
+        lines.append(f"Sheet: {sheet_name}")
+        lines.append(f"Dimensions: {len(df)} rows × {len(df.columns)} columns")
+        lines.append("")
+
+        # Add headers if they exist
+        if not df.columns.empty:
+            headers = [str(col) for col in df.columns]
+            lines.append("COLUMNS: " + " | ".join(headers))
+            lines.append("-" * (len(" | ".join(headers)) + 10))
+
+        # Add data rows with proper formatting - each cell on its own line for readability
+        for idx, row in df.iterrows():
+            row_data = []
+            for cell in row:
+                cell_str = str(cell).strip()
+                if cell_str:  # Only add non-empty cells
+                    # Split multi-line cells and preserve line breaks
+                    if '\n' in cell_str:
+                        cell_lines = cell_str.split('\n')
+                        for line in cell_lines:
+                            if line.strip():
+                                row_data.append(f"  {line.strip()}")
+                    else:
+                        row_data.append(cell_str)
+
+            if row_data:  # Only add non-empty rows
+                lines.append(" | ".join(row_data))
+                lines.append("")  # Add blank line between rows for readability
+
+        return "\n".join(lines)
+
+    def _generate_excel_markdown_content(self, df: pd.DataFrame, sheet_name: str) -> str:
+        """Generate well-formatted markdown content for Excel data."""
+        if df.empty:
+            return f"*Sheet '{sheet_name}' contains no data.*"
+
+        lines = []
+
+        # Add sheet information
+        lines.append(f"**Sheet:** {sheet_name}")
+        lines.append(f"**Dimensions:** {len(df)} rows × {len(df.columns)} columns")
+        lines.append("")
+
+        # Create enhanced markdown table
+        if not df.empty:
+            try:
+                # Use pandas to_markdown with better formatting
+                markdown_table = df.to_markdown(index=False, tablefmt='pipe')
+                lines.append(markdown_table)
+            except Exception:
+                # Fallback to manual table creation
+                headers = [str(col).strip() for col in df.columns]
+                lines.append("| " + " | ".join(headers) + " |")
+                lines.append("|" + "|".join([" --- " for _ in headers]) + "|")
+
+                for idx, row in df.iterrows():
+                    row_data = [str(cell).strip() for cell in row]
+                    lines.append("| " + " | ".join(row_data) + " |")
+
+        return "\n".join(lines)
+
+    def _clean_excel_nan_artifacts(self, content: str) -> str:
+        """Clean NaN artifacts from Excel content while preserving line structure."""
+        import re
+
+        # Only clean obvious NaN artifacts without destroying structure
+        content = re.sub(r'\|\s*nan\s*\|', '| |', content, flags=re.IGNORECASE)  # Table cells
+        content = re.sub(r'\|\s*NaN\s*\|', '| |', content)  # Table cells
+        content = re.sub(r'\|\s*NAN\s*\|', '| |', content)  # Table cells
+
+        # Clean standalone nan values but preserve line breaks - ONLY for non-table lines
+        lines = content.split('\n')
+        cleaned_lines = []
+
+        for line in lines:
+            # Skip cleaning for table lines (lines that start with |)
+            if line.strip().startswith('|'):
+                cleaned_lines.append(line)
+            else:
+                # Clean nan from non-table lines
+                line = re.sub(r'^nan\s*$', '', line, flags=re.IGNORECASE)  # Standalone nan
+                line = re.sub(r'\s+nan\s+', ' ', line, flags=re.IGNORECASE)  # Surrounded nan
+                cleaned_lines.append(line)
+
+        content = '\n'.join(cleaned_lines)
+
+        # Clean up empty table cells but preserve structure
+        content = re.sub(r'\|\s*\|', '| |', content)  # Empty table cells
+
+        return content.strip()
+
+    def _detect_excel_header_row(self, df_raw: pd.DataFrame) -> int | None:
+        """Detect the actual header row in Excel data."""
+        for row_idx in range(min(3, len(df_raw))):  # Check first 3 rows
+            row = df_raw.iloc[row_idx]
+
+            # Count non-empty cells
+            non_empty_count = sum(1 for cell in row if str(cell).strip() and str(cell) != 'nan')
+
+            # Check if this row has enough content to be headers
+            if non_empty_count >= len(row) * 0.6:  # At least 60% non-empty
+                # Additional check: headers usually contain text, not just numbers
+                text_cells = sum(1 for cell in row if str(cell).strip() and not str(cell).replace('.', '').replace('-', '').isdigit())
+
+                if text_cells >= non_empty_count * 0.5:  # At least 50% text cells
+                    return row_idx
+
+        return None  # No clear header row found
+
+    def _clean_excel_column_names(self, columns) -> list:
+        """Clean and format Excel column names."""
+        cleaned_columns = []
+
+        for col in columns:
+            col_str = str(col).strip()
+
+            # Handle multi-line headers by taking the first meaningful line
+            if '\n' in col_str:
+                lines = col_str.split('\n')
+                # Find the first non-empty line
+                for line in lines:
+                    if line.strip():
+                        col_str = line.strip()
+                        break
+
+            # Clean up the column name
+            col_str = col_str.replace('\xa0', ' ')  # Replace non-breaking spaces
+            col_str = ' '.join(col_str.split())  # Normalize whitespace
+
+            # Truncate very long column names but keep them meaningful
+            if len(col_str) > 50:
+                col_str = col_str[:47] + "..."
+
+            # Ensure we have a valid column name
+            if not col_str or col_str == 'nan':
+                col_str = f"Column_{len(cleaned_columns) + 1}"
+
+            cleaned_columns.append(col_str)
+
+        return cleaned_columns
+
+    def _generate_excel_markdown_content_enhanced(self, df: pd.DataFrame, sheet_name: str) -> str:
+        """Generate enhanced markdown content with proper table formatting."""
+        if df.empty:
+            return f"*Sheet '{sheet_name}' contains no data.*"
+
+        lines = []
+
+        # Add sheet information with proper markdown formatting
+        lines.append(f"## 📊 {sheet_name}")
+        lines.append("")
+        lines.append(f"**Dimensions:** {len(df)} rows × {len(df.columns)} columns")
+        lines.append("")
+
+        # Create properly formatted markdown table
+        if not df.empty:
+            try:
+                # Prepare data for markdown table
+                table_data = []
+
+                # Add headers with proper formatting
+                headers = [self._format_markdown_header(str(col)) for col in df.columns]
+                table_data.append(headers)
+
+                # Add separator row
+                separators = ['---' for _ in headers]
+                table_data.append(separators)
+
+                # Add data rows with proper cell formatting
+                for idx, row in df.iterrows():
+                    formatted_row = []
+                    for cell in row:
+                        formatted_cell = self._format_markdown_cell(str(cell))
+                        formatted_row.append(formatted_cell)
+                    table_data.append(formatted_row)
+
+                # Generate the markdown table
+                markdown_table = self._create_markdown_table(table_data)
+
+                # Always add table lines separately to ensure proper line breaks
+                table_lines = markdown_table.split('\n')
+                lines.extend(table_lines)
+
+            except Exception as e:
+                # Fallback to simple format
+                lines.append(f"*Error generating table: {e}*")
+                lines.append("")
+                lines.append("**Raw Data:**")
+                for idx, row in df.iterrows():
+                    row_data = [str(cell).strip() for cell in row if str(cell).strip()]
+                    if row_data:
+                        lines.append(f"- {' | '.join(row_data)}")
+
+        return "\n".join(lines)
+
+    def _format_markdown_header(self, header: str) -> str:
+        """Format header for markdown table with full content preservation."""
+        header = header.strip()
+
+        # Handle multi-line headers - PRESERVE ALL CONTENT
+        if '\n' in header:
+            # Convert newlines to space for headers (more compact than <br>)
+            lines = [line.strip() for line in header.split('\n') if line.strip()]
+            header = ' '.join(lines)
+
+        # Clean up special characters that break markdown
+        header = header.replace('|', '\\|')  # Escape pipes
+        header = header.replace('\xa0', ' ')  # Replace non-breaking spaces
+        header = ' '.join(header.split())  # Normalize whitespace
+
+        # NO TRUNCATION - preserve complete header content
+        # Remove truncation to prevent data loss in headers
+
+        return f"**{header}**"
+
+    def _format_markdown_cell(self, cell: str) -> str:
+        """Format cell content for markdown table with full data preservation."""
+        cell = cell.strip()
+
+        # Handle empty cells
+        if not cell or cell == 'nan':
+            return ' '
+
+        # Handle multi-line content - PRESERVE ALL CONTENT
+        if '\n' in cell:
+            # Convert newlines to <br> for markdown compatibility
+            lines = [line.strip() for line in cell.split('\n') if line.strip()]
+            # Join all lines with <br> to preserve complete content
+            cell = '<br>'.join(lines)
+
+        # Clean up special characters but preserve content
+        cell = cell.replace('|', '\\|')  # Escape pipes
+        cell = cell.replace('\xa0', ' ')  # Replace non-breaking spaces
+        cell = ' '.join(cell.split())  # Normalize whitespace
+
+        # NO TRUNCATION - preserve all data
+        # Remove the truncation logic to prevent data loss
+
+        return cell
+
+    def _create_markdown_table(self, table_data: list) -> str:
+        """Create a properly formatted markdown table with proper line breaks."""
+        if not table_data or len(table_data) < 2:
+            return "*No table data available*"
+
+        # For better readability, use simpler table format without complex alignment
+        table_lines = []
+
+        for row_idx, row in enumerate(table_data):
+            if row_idx == 1:  # Separator row
+                # Create simple separator
+                separators = ['---' for _ in row]
+                table_lines.append('| ' + ' | '.join(separators) + ' |')
+            else:
+                # Regular data row - ensure proper escaping and formatting
+                cells = []
+                for cell in row:
+                    cell_str = str(cell).strip()
+                    # Ensure cell doesn't break table structure
+                    if not cell_str:
+                        cell_str = ' '
+                    cells.append(cell_str)
+                table_lines.append('| ' + ' | '.join(cells) + ' |')
+
+        return '\n'.join(table_lines)
 
     def _parse_pptx(self, file_path: str) -> Tuple[str, str]:
         """Parse PPTX using python-pptx with enhanced table extraction."""
@@ -1197,8 +1528,9 @@ class DoclingService(BaseParser):
         content = re.sub(r'\s+nan$', '', content, flags=re.IGNORECASE | re.MULTILINE)  # Line end
 
         # Clean up extra whitespace that might result from nan removal
-        content = re.sub(r'\s+', ' ', content)  # Multiple spaces to single space
+        # PRESERVE NEWLINES - only collapse spaces, not newlines
+        content = re.sub(r'[ \t]+', ' ', content)  # Multiple spaces/tabs to single space (preserve newlines)
         content = re.sub(r'\|\s*\|', '| |', content)  # Empty table cells
-        content = re.sub(r'\n\s*\n', '\n', content)  # Multiple newlines to single
+        content = re.sub(r'\n\s*\n\s*\n+', '\n\n', content)  # Multiple newlines to double newline max
 
         return content.strip()

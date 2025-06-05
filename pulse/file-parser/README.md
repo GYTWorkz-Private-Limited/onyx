@@ -33,7 +33,7 @@ Copy `.env.example` to `.env` and configure:
 
 ```env
 # LlamaParse Configuration (optional - for cloud parsing)
-LLAMA_CLOUD_API_KEY=your-api-key-here
+LLAMA_CLOUD_API_KEY=your_llamaparse_api_key_here
 PARSER_MODE=balanced
 OUTPUT_FORMAT=markdown
 
