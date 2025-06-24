@@ -1,0 +1,8 @@
+{
+  "name": "average_growth_value_2 ",
+  "description": "Average value of orders placed",
+  "formula": "SELECT oi.product_id, SUM(oi.price) AS revenue_by_product FROM order_items oi GROUP BY oi.product_id;",
+  "formula_type": "general",
+  "group_by": null,
+  "created_at": "2025-06-20T07:05:52.940685"
+}

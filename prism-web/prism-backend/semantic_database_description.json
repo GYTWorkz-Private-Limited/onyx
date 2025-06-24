@@ -1,0 +1,298 @@
+{
+  "postgres": {
+    "products": {
+      "columns": {
+        "id": {
+          "column_info": {
+            "min": 21.0,
+            "max": 418.0,
+            "mean": 232.95539033457248,
+            "25%": 97.0,
+            "50%": 280.0,
+            "100%": 418.0
+          },
+          "description": "The `id` column is an INTEGER type, non-nullable, auto-incrementing primary key in the dataset, ranging from 21 to 418 with a mean of approximately 233. It uniquely identifies each record, ensuring data integrity and efficient indexing for operations such as vector search, retrieval, and management within the dataset."
+        },
+        "title": {
+          "column_info": "testt, Fertilzer pellets, Lawn Aerator, kdjfshksd, Tree TREE, Spring Lawn Cleanup test, lawn gloves, Earthworm compost, Red Mulch, TST",
+          "description": "The `title` column contains descriptive names of gardening and landscaping products, including items like fertilizer pellets, lawn aerators, compost, mulch, and gloves. This column is essential for identifying and categorizing various gardening supplies and tools, aiding in product search and selection within a horticultural or landscaping dataset."
+        },
+        "base_price": {
+          "column_info": {
+            "min": 0.0,
+            "max": 30000.0,
+            "mean": 682.741797235023,
+            "25%": 29.0,
+            "50%": 150.0,
+            "100%": 30000.0
+          },
+          "description": "The `base_price` column represents the foundational cost of an item or service in the dataset, with values ranging from 0.0 to 30,000.0. It is a numeric field with two decimal precision, capturing essential pricing information. The column is neither unique nor a primary key, indicating it may contain repeated values across different entries. The statistical distribution shows a mean of approximately 682.74, with a median of 150.0, suggesting a wide range of base prices. This column is crucial for financial analysis, pricing strategies, and economic assessments within the dataset."
+        },
+        "category_id": {
+          "column_info": {
+            "min": 1.0,
+            "max": 144.0,
+            "mean": 18.54646840148699,
+            "25%": 2.0,
+            "50%": 4.0,
+            "100%": 144.0
+          },
+          "description": "The `category_id` column is an integer field representing distinct categories within the dataset, ranging from 1 to 144. It is a non-nullable field, indicating that each entry must have a category identifier. This column is integral for categorization and classification tasks, providing a structured way to group and analyze data based on predefined categories. With a mean value of 18.55 and quartile values suggesting a concentration of lower category IDs, it plays a crucial role in organizing and segmenting data for efficient retrieval and analysis in vector search applications."
+        },
+        "description": {
+          "column_info": "test, Nourish Growth: Concentrated formula provides key nutrients to support healthy growth and production for a wide variety of plants including vegetables, fruits, herbs and flowers. Easy Application: Simply add recommended amount to watering can and apply to soil or foliar spray as needed for fast absorption. Stimulate Yields: Micronutrients boost photosynthesis and metabolism to help maximize harvest sizes from established plants. All-Season Formula: Suitable for use throughout the growing cycle from early growth stage to maturation to keep plants thriving year-round. 3 Bottle Pack: Convenient three bottle set provides enough nutrient-rich solution for large or many small-scale gardens, groves or plantings., Lawn Aerator, fjskdfksd, TESTT, TEST, lawn gloves, Nelgates Premium Earthworm compost for plants, Suitable for all plants, compost for plant growth 500gms, Helps to regulate soil temperature and prevent soil erosion, pressure sprayer",
+          "description": "The `description` column contains detailed text entries providing information about various gardening products, including their features, benefits, and usage instructions. It includes descriptions of plant nutrients, lawn care tools, compost, and other gardening supplies, highlighting aspects like growth support, application methods, and product packaging."
+        },
+        "asset_url": {
+          "column_info": "_DSC6661.jpg, LD1.png, LawnAerator.jpeg, c0a9a046-360d-422a-bcc4-b9b7ab60638d.png, download (1).jpg, download (2).jpg, lawn gloves.png, vermicompost1-Photoroom.png, 20250317034828-_DSC6683.jpg, free-photo-of-person-driving-a-lawnmower.jpeg",
+          "description": "The `asset_url` column contains file names of image assets, likely representing various gardening tools and equipment. These filenames include diverse formats such as JPEG and PNG, and feature descriptive names like lawnmower, vermicompost, and lawn gloves, as well as generic names and unique identifiers. This column is essential for indexing and retrieving visual content related to gardening in a vector search context."
+        },
+        "created_at": {
+          "column_info": "",
+          "description": "The `created_at` column, of TIMESTAMP data type, records the date and time when a record was created in the dataset. It is nullable and defaults to the current timestamp, capturing precise creation times for data entries. This column is crucial for tracking data entry history, temporal analysis, and chronological sorting within the dataset."
+        },
+        "updated_at": {
+          "column_info": "",
+          "description": "The `updated_at` column, of data type TIMESTAMP, records the date and time when a record was last modified. It is nullable and defaults to the current timestamp if not provided, ensuring accurate tracking of changes. This column is essential for maintaining data integrity and version control, allowing users to identify the most recent updates in the dataset."
+        },
+        "type": {
+          "column_info": "product, service",
+          "description": "The `type` column is a VARCHAR(7) field that categorizes entries as either \"product\" or \"service.\" This column likely represents the classification of items within the dataset, distinguishing between tangible goods and intangible offerings. It is not unique, primary, or auto-incrementing, allowing for multiple entries of each type. This classification is crucial for filtering and analyzing data based on the nature of the offering, whether it is a physical product or a service provided."
+        },
+        "features": {
+          "column_info": "",
+          "description": "The `features` column, stored as JSONB, likely contains a flexible and structured set of attributes or characteristics related to each record in the dataset. This column may include a variety of data types and nested information, providing detailed and customizable metadata for each entry. Its JSONB format allows for efficient querying and indexing, making it ideal for complex searches and analysis in a vector search context. The `features` column is not constrained by uniqueness or primary key requirements, suggesting it serves as a supplementary, descriptive resource for enhanced data exploration and retrieval."
+        },
+        "seo_keywords": {
+          "column_info": "",
+          "description": "The `seo_keywords` column is an array that stores search engine optimization keywords associated with a dataset entry. These keywords are likely used to enhance the visibility and searchability of the content in digital platforms. The column is nullable and defaults to an empty text array, indicating that entries may or may not have associated SEO keywords."
+        },
+        "tag": {
+          "column_info": "",
+          "description": "The `tag` column is a VARCHAR(50) field that likely represents categorizations, labels, or keywords associated with records in the dataset. It is used for organizing, filtering, or searching data entries. This column is nullable, allowing for optional tagging, and is not constrained by uniqueness or primary key requirements, enabling multiple records to share the same tag."
+        },
+        "status": {
+          "column_info": "inactive, active",
+          "description": "The `status` column is a VARCHAR(8) field that indicates the current state of an entity within the dataset, with possible values of \"active\" or \"inactive.\" It is nullable and defaults to \"active,\" suggesting it tracks whether an entity is currently operational or not. This column is crucial for filtering and categorizing data based on operational status."
+        },
+        "trend_type": {
+          "column_info": "",
+          "description": "The `trend_type` column, a VARCHAR(50) field, likely categorizes or labels different types of trends within the dataset. This column may include various trend classifications, such as seasonal, cyclical, or emerging trends, providing insights into patterns or changes over time. It is a non-unique, nullable field, indicating that not all entries may have a trend type assigned."
+        },
+        "discount_id": {
+          "column_info": {
+            "min": 77.0,
+            "max": 179.0,
+            "mean": 131.06666666666666,
+            "25%": 111.0,
+            "50%": 111.0,
+            "100%": 179.0
+          },
+          "description": "The `discount_id` column is an integer field representing unique identifiers for discounts within the dataset. With values ranging from 77 to 179 and a mean of 131.07, this column likely categorizes different discount offers or promotions. It is not auto-incremented, primary key, or unique, suggesting multiple entries may share the same discount ID, indicating repeated use or applicability of certain discounts. The column is nullable, allowing for entries without an assigned discount."
+        },
+        "offer_id": {
+          "column_info": {
+            "min": 13.0,
+            "max": 101.0,
+            "mean": 92.35757575757576,
+            "25%": 95.0,
+            "50%": 95.0,
+            "100%": 101.0
+          },
+          "description": "The `offer_id` column is an INTEGER field representing unique identifiers for offers within the dataset. With values ranging from 13 to 101, it captures offer-related data points and is essential for categorizing and differentiating between various offers. Although not auto-incremented or unique, it plays a crucial role in organizing and analyzing offer information."
+        }
+      },
+      "table_description": "The `products` table is a comprehensive dataset for managing gardening and landscaping products and services. It includes essential details such as product titles, pricing, categories, descriptions, and images, along with metadata like creation and update timestamps. The table supports categorization and searchability through fields like `category_id`, `type`, `features`, `seo_keywords`, and `tag`. It also tracks operational status and trends, and links to discounts and offers via `discount_id` and `offer_id`. This table is crucial for inventory management, product search, and sales analysis in a horticultural or landscaping business context."
+    },
+    "orders": {
+      "columns": {
+        "id": {
+          "column_info": "OD1944bb1a98a5, OD1940840b53f1, OD1943fabde510, OD19449feff505, OD193d533ac876, OD193d537d42a7, OD193d537fc7a8, OD193d53aa2390, OD193d53aff291, OD193d53b67a02",
+          "description": "The `id` column is a non-nullable, primary key field of type VARCHAR(255), uniquely identifying each record in the dataset. It contains alphanumeric identifiers, likely representing order IDs or transaction IDs, crucial for distinguishing and referencing individual entries within the database."
+        },
+        "user_id": {
+          "column_info": "b4087498-7021-70fd-f609-5937baeb1dde, c4181438-5041-7059-df30-5cea97e1e59a, b4a884b8-50d1-705b-579c-1de24300160d, 94d8f428-b0e1-70e8-1482-4a9dd98100c2, 24582458-60f1-70e3-a43d-68ebae1ce38d, 2468d408-e0a1-709b-19e7-22ea0fc9f518, d4487498-b031-70a8-303e-5df4da942a76, 84082458-2071-706f-1391-a9886b817bbd, 24182468-4041-7092-1d14-847b364606e6, 64b844e8-a081-7000-3b16-e4600a6cec8b",
+          "description": "The `user_id` column contains unique identifiers for users, formatted as UUIDs (Universally Unique Identifiers). These alphanumeric strings are used to distinctly identify each user in the dataset, ensuring accurate tracking and association of user-related data. The column is nullable and does not auto-increment, allowing for flexibility in user identification and management."
+        },
+        "address_id": {
+          "column_info": {
+            "min": 96.0,
+            "max": 309.0,
+            "mean": 174.33333333333334,
+            "25%": 103.0,
+            "50%": 196.0,
+            "100%": 309.0
+          },
+          "description": "The `address_id` column is an integer-based identifier that potentially represents unique addresses within the dataset. With values ranging from 96 to 309 and a mean of 174.33, this column is likely used to map or reference specific address entries, though it is not a primary key and may contain duplicate or null values. It serves as a crucial element for identifying and organizing address-related information in the dataset."
+        },
+        "status": {
+          "column_info": "payment_pending, payment_success, payment_failed, completed, cancelled",
+          "description": "The `status` column is a non-nullable VARCHAR(50) field representing the current state of a transaction or order in the dataset. It includes values such as payment_pending, payment_success, payment_failed, completed, and cancelled, indicating various stages of the payment and order process. The default value is payment_pending, suggesting the initial state of transactions. This column is crucial for tracking transaction progress and outcomes, facilitating order management and payment processing analysis."
+        },
+        "order_value": {
+          "column_info": {
+            "min": 0.0,
+            "max": 52068.82,
+            "mean": 1273.7444834307994,
+            "25%": 24.61,
+            "50%": 142.52,
+            "100%": 52068.82
+          },
+          "description": "The `order_value` column represents the monetary amount of individual orders in the dataset, captured as a numeric value with two decimal precision. It ranges from a minimum of 0.0 to a maximum of 52068.82, with a mean order value of approximately 1273.74. This column is non-nullable and likely reflects the financial value of transactions, providing insights into order sizes and revenue distribution."
+        },
+        "created_at": {
+          "column_info": "",
+          "description": "The `created_at` column, of TIMESTAMP data type, records the date and time when a record was created in the dataset. It is nullable and defaults to the current timestamp, capturing the precise moment of entry creation. This column is crucial for tracking the temporal aspect of data, facilitating chronological sorting, time-based analysis, and historical record-keeping."
+        },
+        "updated_at": {
+          "column_info": "",
+          "description": "The `updated_at` column, of TIMESTAMP data type, likely represents the date and time when a record was last modified or updated in the dataset. This column is nullable and defaults to the current timestamp, indicating automatic updates upon record modification. It is not unique or a primary key, suggesting it is used for tracking changes rather than identifying records."
+        },
+        "delivery_instructions": {
+          "column_info": "",
+          "description": "The `delivery_instructions` column contains text-based information detailing specific guidelines or preferences for delivering a package or service. It may include directions, access codes, contact details, or special handling requests to ensure accurate and efficient delivery. This column is optional, allowing for customized instructions to enhance the delivery process."
+        },
+        "installation_required": {
+          "column_info": {
+            "min": null,
+            "max": null,
+            "mean": null,
+            "25%": null,
+            "50%": null,
+            "100%": null
+          },
+          "description": "The `installation_required` column is a BOOLEAN field indicating whether installation is needed for a specific item or service. It is nullable, meaning it can contain true, false, or null values. This column is not unique and does not serve as a primary key, suggesting it is used to provide additional information about the necessity of installation within the dataset."
+        },
+        "order_fulfillment_method": {
+          "column_info": "",
+          "description": "The `order_fulfillment_method` column likely represents the method or process by which an order is completed and delivered to the customer. This VARCHAR(8) field may include values indicating different fulfillment options such as \"pickup,\" \"delivery,\" or \"ship,\" providing insight into the logistics and customer service aspects of the order process. It is a non-unique, nullable field that is crucial for understanding order management and fulfillment strategies within the dataset."
+        },
+        "delivered_date": {
+          "column_info": "",
+          "description": "The `delivered_date` column, of TIMESTAMP data type, likely represents the date and time when an item or service was delivered. It is a nullable field, meaning it may not always contain data, and it is not unique or a primary key, indicating multiple entries can share the same timestamp. This column is crucial for tracking delivery timelines, analyzing delivery efficiency, and managing logistics."
+        },
+        "checkout_type": {
+          "column_info": "product, cart, bundle",
+          "description": "The `checkout_type` column represents the category or method of checkout used in a transaction, such as product, cart, or bundle. This VARCHAR(50) field is crucial for identifying the type of purchase process, providing insights into consumer behavior and transaction types. It is not unique or a primary key, allowing for multiple entries of the same checkout type."
+        },
+        "admin_notes": {
+          "column_info": "",
+          "description": "The `admin_notes` column is a text field that contains optional, non-unique annotations or remarks made by administrators. This column is not auto-incremented and does not serve as a primary key. It is used for storing additional information, comments, or observations relevant to the dataset, providing context or insights that may not be captured in other fields."
+        }
+      },
+      "table_description": "The `orders` table captures detailed information about customer transactions within a relational database. Each record uniquely identifies an order through the `id` column and associates it with a user (`user_id`) and address (`address_id`). It tracks the order's status, value, and timestamps for creation and updates. Optional fields like `delivery_instructions` and `installation_required` provide additional context for order fulfillment, which can be completed through various methods (`order_fulfillment_method`). The table supports order management, payment processing analysis, and logistical tracking, with fields like `delivered_date` and `checkout_type` offering insights into delivery efficiency and consumer behavior. Admin notes allow for additional context or remarks."
+    },
+    "discounts": {
+      "columns": {
+        "id": {
+          "column_info": {
+            "min": 45.0,
+            "max": 180.0,
+            "mean": 118.04166666666667,
+            "25%": 108.75,
+            "50%": 122.0,
+            "100%": 180.0
+          },
+          "description": "The `id` column is an auto-incrementing primary key of type INTEGER, uniquely identifying each record in the dataset. It ranges from 45 to 180, with a mean value of approximately 118, ensuring each entry has a distinct identifier for efficient data management and retrieval."
+        },
+        "discount_name": {
+          "column_info": "TEST 56, TEST, Lawn Sale, Christmas discount, Test Sale, Catagory discount test, test, TEST70, Test Specific discount, TEST 59",
+          "description": "The `discount_name` column contains descriptive labels for various discounts and sales promotions, including seasonal, category-specific, and test discounts, represented as text strings. These labels help identify and categorize different discount events within the dataset."
+        },
+        "discount_type": {
+          "column_info": "amount, percentage",
+          "description": "The `discount_type` column represents the type of discount applied to a transaction or product, indicating whether it is a fixed amount or a percentage discount. This non-nullable VARCHAR(50) field is crucial for understanding the nature of discounts within the dataset, providing insight into pricing strategies and customer incentives."
+        },
+        "discount_value": {
+          "column_info": {
+            "min": 2.0,
+            "max": 900.0,
+            "mean": 62.833333333333336,
+            "25%": 20.0,
+            "50%": 21.5,
+            "100%": 900.0
+          },
+          "description": "The `discount_value` column represents the monetary value of discounts applied to transactions, with values ranging from 2.00 to 900.00. This numeric field, with a precision of two decimal places, captures the financial reduction offered, reflecting a mean discount of 62.83. It is a crucial metric for analyzing discount trends and customer savings in the dataset."
+        },
+        "start_date": {
+          "column_info": "",
+          "description": "The `start_date` column, of data type DATE, likely represents the initiation date or commencement date of an event, project, or process within the dataset. It is nullable, indicating that not all records may have a start date. This column is not unique, suggesting multiple entries can share the same start date, and it is not a primary key. It does not auto-increment and has no default value, emphasizing its role in capturing specific, user-defined dates."
+        },
+        "end_date": {
+          "column_info": "",
+          "description": "The `end_date` column, of data type DATE, likely represents the concluding date of an event, project, or time period within the dataset. This column is nullable, allowing for entries without specified end dates, and is not constrained by uniqueness or primary key requirements. It serves as a crucial temporal marker, essential for time-based analyses, deadline tracking, and chronological sorting."
+        },
+        "start_time": {
+          "column_info": "",
+          "description": "The `start_time` column, with a data type of TIME, likely represents the specific time at which an event, activity, or process begins within the dataset. This column is nullable, indicating that not all entries may have a start time recorded. It is not unique or a primary key, suggesting that multiple entries can share the same start time. This column is essential for time-based analyses, scheduling, and chronological ordering of events."
+        },
+        "end_time": {
+          "column_info": "",
+          "description": "The `end_time` column represents the specific time at which an event or activity concludes within the dataset. As a TIME data type, it records the precise ending time, which is crucial for time-based analysis, scheduling, and duration calculations. This column is nullable, indicating that the end time may not always be available or applicable. It is not unique or a primary key, suggesting it is used in conjunction with other columns for comprehensive temporal insights."
+        },
+        "created_at": {
+          "column_info": "",
+          "description": "The `created_at` column, of TIMESTAMP data type, records the date and time when a record is created in the dataset. It is nullable and defaults to the current timestamp, capturing the precise creation moment. This column is crucial for tracking the temporal aspect of data entries, enabling time-based queries and analysis."
+        },
+        "updated_at": {
+          "column_info": "",
+          "description": "The `updated_at` column, of TIMESTAMP data type, records the date and time when a record was last modified. It is nullable and defaults to the current timestamp, indicating the most recent update. This column is essential for tracking changes, ensuring data freshness, and maintaining version history within the dataset."
+        },
+        "discount_scope": {
+          "column_info": "specificCategories, specificProducts, , allProducts, recommendedProducts",
+          "description": "The `discount_scope` column likely represents the categories or products eligible for discounts within the dataset. It includes values such as specificCategories, specificProducts, allProducts, and recommendedProducts, indicating the range or focus of discount applicability. This column is crucial for understanding discount strategies, targeting specific product groups, and optimizing promotional efforts."
+        },
+        "status": {
+          "column_info": "active, inactive",
+          "description": "The `status` column is a VARCHAR(50) field that indicates the current state of an entity, such as a user or account, within the dataset. It can hold values like \"active\" or \"inactive,\" reflecting whether the entity is currently operational or not. The column is nullable and defaults to \"active,\" suggesting that entities are generally expected to be active unless specified otherwise. This column is crucial for filtering and managing records based on their operational status."
+        }
+      },
+      "table_description": "The `discounts` table in a relational database tracks various discount events and promotions. Each record uniquely identifies a discount through an auto-incrementing `id` and provides details such as `discount_name`, `discount_type` (fixed or percentage), and `discount_value`. Temporal data is captured with `start_date`, `end_date`, `start_time`, and `end_time`, while `created_at` and `updated_at` timestamps track record changes. The `discount_scope` specifies eligible product categories, and `status` indicates if a discount is active. This table is essential for managing discount strategies, analyzing trends, and optimizing promotional efforts."
+    },
+    "payment_transactions": {
+      "columns": {
+        "order_id": {
+          "column_info": "OD1933f2e7d0010, OD19372f98bc20, OD1934f8b138031, OD19376f262972, OD19376f5f3fb4, OD1933f6e886618, OD19396ccaaae0, OD19396db3e121, OD1939b409a2d6, OD193a268f4841",
+          "description": "The `order_id` column contains unique identifiers for customer orders, represented as alphanumeric strings. These identifiers facilitate tracking and managing orders within the dataset, ensuring each transaction is distinct and traceable. The `order_id` is a non-nullable field, critical for order management and analytics."
+        },
+        "transaction_id": {
+          "column_info": "80030504599, 80030507385, 80030036921, 80030521770, 80030521850, 80031111805, 80031115955, 80031118196, 80031212792, 80031292830",
+          "description": "The `transaction_id` column is a primary key field in the dataset, uniquely identifying each transaction record with a VARCHAR(50) data type. This non-nullable, non-auto-incrementing field contains unique numeric strings, ensuring distinct identification of transactions for accurate tracking and retrieval in database operations."
+        },
+        "status": {
+          "column_info": "SUCCESS, FAILED",
+          "description": "The `status` column is a non-nullable VARCHAR(8) field indicating the outcome of a process, transaction, or operation, with possible values \"SUCCESS\" or \"FAILED\". It serves as a key indicator of completion status, providing critical insights into operational results and process effectiveness within the dataset."
+        },
+        "authorization_code": {
+          "column_info": "",
+          "description": "The `authorization_code` column is a VARCHAR(50) field that likely stores unique alphanumeric codes used for authentication or transaction approval processes. This column may contain authorization codes for secure access, payment verification, or user identification, and is nullable, allowing for optional entries."
+        },
+        "amount": {
+          "column_info": {
+            "min": 0.01,
+            "max": 52068.82,
+            "mean": 1892.395189873418,
+            "25%": 21.667499999999997,
+            "50%": 107.0,
+            "100%": 52068.82
+          },
+          "description": "The `amount` column represents monetary values in a dataset, with a data type of NUMERIC(10, 2), ensuring precision for financial transactions. It captures a wide range of values from a minimum of 0.01 to a maximum of 52068.82, with a mean of 1892.40. The column is non-nullable, indicating that every entry must have a value. This column is crucial for financial analysis, budgeting, or transaction records, providing insights into spending patterns, revenue, or costs."
+        },
+        "payment_method": {
+          "column_info": "Authorize.Net, Authorize.net",
+          "description": "The `payment_method` column, with a data type of VARCHAR(20), represents the method used for processing payments in the dataset. It includes values such as \"Authorize.Net\" and \"Authorize.net,\" indicating different variations of the same payment gateway. This non-nullable field is crucial for identifying and categorizing the payment gateways used in transactions, ensuring accurate financial processing and reporting."
+        },
+        "created_at": {
+          "column_info": "",
+          "description": "The `created_at` column, of TIMESTAMP data type, records the date and time when each entry was created in the dataset. It is nullable and defaults to the current timestamp, indicating it captures the creation moment of records. This column is crucial for tracking the chronological order of data entries and analyzing temporal trends or changes over time. It is neither auto-incremented nor unique, allowing multiple entries to share the same timestamp."
+        },
+        "updated_at": {
+          "column_info": "",
+          "description": "The `updated_at` column, of TIMESTAMP data type, records the date and time when a record was last modified. It is nullable and defaults to the current timestamp, indicating it automatically logs updates to entries. This column is essential for tracking changes, auditing, and maintaining data integrity by providing a chronological update history."
+        }
+      },
+      "table_description": "The `payment_transactions` table records detailed information about customer payment transactions. Each entry is uniquely identified by a `transaction_id` and includes data such as `order_id`, `status` (either \"SUCCESS\" or \"FAILED\"), `authorization_code`, `amount`, `payment_method`, and timestamps for creation and updates. This table is essential for tracking, managing, and analyzing financial transactions, providing insights into payment methods, transaction statuses, and financial trends. It supports financial reporting, auditing, and operational efficiency in a relational database context."
+    },
+    "database_description": "The `postgres` database is designed for managing a horticultural or landscaping business, focusing on products, orders, discounts, and payment transactions. Key tables include:\n\n- **Products**: Manages gardening and landscaping products/services with details like pricing, categories, and discounts. It supports inventory management and sales analysis.\n- **Orders**: Captures customer transactions, linking to users and addresses, and tracks order fulfillment and status.\n- **Discounts**: Manages promotional events, detailing discount types and applicable product categories.\n- **Payment Transactions**: Records payment details, tracking transaction status and methods for financial analysis.\n\n**Key Relationships**:\n- Products link to categories, discounts, and offers.\n- Orders link to users and addresses.\n- Discounts apply to specific product categories.\n\nThis structure aids in inventory, sales, and financial management, providing insights into consumer behavior and operational efficiency."
+  }
+}

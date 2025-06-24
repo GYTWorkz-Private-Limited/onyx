@@ -1,0 +1,9 @@
+[
+  {
+    "description": "Analyze total revenue generated over time to visualize sales trends.",
+    "sql_query": "SELECT DATE(created_at) AS transaction_date, SUM(amount) AS total_revenue FROM payment_transactions WHERE status = 'completed' GROUP BY transaction_date ORDER BY transaction_date;",
+    "sql_result": {
+      "error": "(psycopg2.errors.InvalidTextRepresentation) invalid input value for enum payment_status: \"completed\"\nLINE 1: ..._revenue FROM payment_transactions WHERE status = 'completed...\n                                                             ^\n\n[SQL: SELECT DATE(created_at) AS transaction_date, SUM(amount) AS total_revenue FROM payment_transactions WHERE status = 'completed' GROUP BY transaction_date ORDER BY transaction_date;]\n(Background on this error at: https://sqlalche.me/e/20/9h9h)"
+    }
+  }
+]

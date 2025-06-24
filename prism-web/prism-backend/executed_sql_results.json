@@ -1,0 +1,226 @@
+[
+  {
+    "chart_type": "Bar",
+    "description": "Number of products in each category",
+    "sql": "SELECT category_id, COUNT(*) AS product_count FROM products GROUP BY category_id ORDER BY product_count DESC",
+    "data": [
+      {
+        "category_id": 1,
+        "product_count": 41
+      },
+      {
+        "category_id": 3,
+        "product_count": 37
+      },
+      {
+        "category_id": 2,
+        "product_count": 36
+      },
+      {
+        "category_id": 4,
+        "product_count": 30
+      },
+      {
+        "category_id": 5,
+        "product_count": 22
+      },
+      {
+        "category_id": 6,
+        "product_count": 21
+      },
+      {
+        "category_id": 7,
+        "product_count": 17
+      },
+      {
+        "category_id": 14,
+        "product_count": 10
+      },
+      {
+        "category_id": 12,
+        "product_count": 10
+      },
+      {
+        "category_id": 125,
+        "product_count": 10
+      },
+      {
+        "category_id": 123,
+        "product_count": 9
+      },
+      {
+        "category_id": 107,
+        "product_count": 7
+      },
+      {
+        "category_id": 15,
+        "product_count": 7
+      },
+      {
+        "category_id": 13,
+        "product_count": 6
+      },
+      {
+        "category_id": 144,
+        "product_count": 2
+      },
+      {
+        "category_id": 109,
+        "product_count": 2
+      },
+      {
+        "category_id": 108,
+        "product_count": 1
+      },
+      {
+        "category_id": 127,
+        "product_count": 1
+      }
+    ]
+  },
+  {
+    "chart_type": "Pie",
+    "description": "Distribution of order statuses",
+    "sql": "SELECT status, COUNT(*) AS status_count FROM orders GROUP BY status",
+    "data": [
+      {
+        "status": "payment_pending",
+        "status_count": 269
+      },
+      {
+        "status": "completed",
+        "status_count": 31
+      },
+      {
+        "status": "cancelled",
+        "status_count": 14
+      },
+      {
+        "status": "payment_failed",
+        "status_count": 59
+      },
+      {
+        "status": "payment_success",
+        "status_count": 140
+      }
+    ]
+  },
+  {
+    "chart_type": "Bar",
+    "description": "Average order value by status",
+    "sql": "SELECT status, AVG(order_value) AS average_order_value FROM orders GROUP BY status",
+    "data": [
+      {
+        "status": "payment_pending",
+        "average_order_value": 1110.352342007435
+      },
+      {
+        "status": "completed",
+        "average_order_value": 2400.122580645161
+      },
+      {
+        "status": "cancelled",
+        "average_order_value": 2795.002857142857
+      },
+      {
+        "status": "payment_failed",
+        "average_order_value": 503.26864406779663
+      },
+      {
+        "status": "payment_success",
+        "average_order_value": 1510.8532142857143
+      }
+    ]
+  },
+  {
+    "chart_type": "Bar",
+    "description": "Total discount value by discount type",
+    "sql": "SELECT discount_type, SUM(discount_value) AS total_discount_value FROM discounts GROUP BY discount_type",
+    "data": [
+      {
+        "discount_type": "amount",
+        "total_discount_value": 1112.0
+      },
+      {
+        "discount_type": "percentage",
+        "total_discount_value": 396.0
+      }
+    ]
+  },
+  {
+    "chart_type": "Pie",
+    "description": "Payment transaction status distribution",
+    "sql": "SELECT status, COUNT(*) AS transaction_count FROM payment_transactions GROUP BY status",
+    "data": [
+      {
+        "status": "FAILED",
+        "transaction_count": 8
+      },
+      {
+        "status": "SUCCESS",
+        "transaction_count": 150
+      }
+    ]
+  },
+  {
+    "chart_type": "Bar",
+    "description": "Number of orders per checkout type",
+    "sql": "SELECT checkout_type, COUNT(*) AS order_count FROM orders GROUP BY checkout_type",
+    "data": [
+      {
+        "checkout_type": "bundle",
+        "order_count": 14
+      },
+      {
+        "checkout_type": "cart",
+        "order_count": 132
+      },
+      {
+        "checkout_type": "product",
+        "order_count": 367
+      }
+    ]
+  },
+  {
+    "chart_type": "Bar",
+    "description": "Average discount value by discount scope",
+    "sql": "SELECT discount_scope, AVG(discount_value) AS average_discount_value FROM discounts GROUP BY discount_scope",
+    "data": [
+      {
+        "discount_scope": "specificProducts",
+        "average_discount_value": 24.076923076923077
+      },
+      {
+        "discount_scope": "recommendedProducts",
+        "average_discount_value": 23.0
+      },
+      {
+        "discount_scope": "",
+        "average_discount_value": 21.5
+      },
+      {
+        "discount_scope": "specificCategories",
+        "average_discount_value": 181.0
+      },
+      {
+        "discount_scope": "allProducts",
+        "average_discount_value": 20.0
+      }
+    ]
+  },
+  {
+    "chart_type": "Bar",
+    "description": "Total revenue by payment method",
+    "sql": "SELECT payment_method, SUM(amount) AS total_revenue FROM payment_transactions GROUP BY payment_method",
+    "data": [
+      {
+        "payment_method": "Authorize.net",
+        "total_revenue": 230.03
+      },
+      {
+        "payment_method": "Authorize.Net",
+        "total_revenue": 298768.41
+      }
+    ]
+  }
+]

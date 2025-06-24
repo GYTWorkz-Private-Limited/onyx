@@ -1,0 +1,28 @@
+[
+
+  {
+    "chart_type": "Line",
+    "description": "Shows transaction trends over time by day",
+    "sql": "SELECT DATE_TRUNC('day', created_at) AS day, COUNT(*) AS total_transactions FROM payment_transactions GROUP BY day ORDER BY day"
+  },
+  {
+    "chart_type": "Bar",
+    "description": "Comparison of successful and failed transactions",
+    "sql": "SELECT status, COUNT(*) AS transaction_count FROM payment_transactions GROUP BY status"
+  },
+  {
+    "chart_type": "Pie",
+    "description": "Distribution of transactions by payment method",
+    "sql": "SELECT payment_method, COUNT(*) AS transaction_count FROM payment_transactions GROUP BY payment_method"
+  },
+  {
+    "chart_type": "Scatter",
+    "description": "Correlation between transaction amount and quantity of order items",       
+    "sql": "SELECT pt.amount, oi.quantity FROM payment_transactions pt JOIN order_items oi ON pt.order_id = oi.order_id"
+  },
+  {
+    "chart_type": "Radar",
+    "description": "Multi-dimensional performance metrics of product calculations",
+    "sql": "SELECT calculation_type, AVG(quantity_per_unit) AS average_quantity, AVG(wastage_percentage) AS average_wastage FROM product_calculators GROUP BY calculation_type"
+  }
+]

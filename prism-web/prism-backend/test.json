@@ -1,0 +1,291 @@
+{
+    "review_comments": [
+        "id",
+        "review_id",
+        "comment_text",
+        "created_at",
+        "updated_at"
+    ],
+    "service_request_assets": [
+        "id",
+        "service_request_id",
+        "image_url",
+        "created_at",
+        "updated_at"
+    ],
+    "payment_transactions": [
+        "order_id",
+        "transaction_id",
+        "status",
+        "authorization_code",
+        "amount",
+        "payment_method",
+        "created_at",
+        "updated_at"
+    ],
+    "product_recommendations": [
+        "product_id",
+        "recommended_product_id",
+        "created_at",
+        "updated_at"
+    ],
+    "offers": [
+        "id",
+        "offer_name",
+        "offer_description",
+        "offer_type",
+        "offer_application_scope",
+        "discount_type",
+        "discount_value",
+        "start_date",
+        "end_date",
+        "start_time",
+        "end_time",
+        "thumbnail",
+        "created_at",
+        "updated_at",
+        "status"
+    ],
+    "contracts": [
+        "id",
+        "hoa_id",
+        "start_date",
+        "end_date",
+        "status",
+        "file",
+        "created_at",
+        "updated_at"
+    ],
+    "assets": [
+        "id",
+        "url",
+        "type",
+        "product_id",
+        "created_at",
+        "updated_at"
+    ],
+    "reviews": [
+        "id",
+        "user_id",
+        "order_id",
+        "product_id",
+        "rating",
+        "description",
+        "status",
+        "created_at",
+        "updated_at"
+    ],
+    "users": [
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+        "email_verified",
+        "phone_number_verified",
+        "role_id",
+        "contact_person",
+        "created_at",
+        "updated_at",
+        "account_type"
+    ],
+    "cart": [
+        "user_id",
+        "product_id",
+        "type",
+        "quantity",
+        "created_at",
+        "updated_at"
+    ],
+    "discounts": [
+        "id",
+        "discount_name",
+        "discount_type",
+        "discount_value",
+        "start_date",
+        "end_date",
+        "start_time",
+        "end_time",
+        "created_at",
+        "updated_at",
+        "discount_scope",
+        "status"
+    ],
+    "roles": [
+        "id",
+        "name"
+    ],
+    "orders": [
+        "id",
+        "user_id",
+        "address_id",
+        "status",
+        "order_value",
+        "created_at",
+        "updated_at",
+        "delivery_instructions",
+        "installation_required",
+        "order_fulfillment_method",
+        "delivered_date",
+        "checkout_type",
+        "admin_notes"
+    ],
+    "bundles": [
+        "id",
+        "bundle_name",
+        "bundle_description",
+        "discount_input_type",
+        "discount_value",
+        "status",
+        "quantity",
+        "product_id"
+    ],
+    "bundle_products": [
+        "id",
+        "bundle_id",
+        "product_id",
+        "quantity"
+    ],
+    "service_provider_requests": [
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+        "service_ids",
+        "street_address",
+        "apartment",
+        "city",
+        "state",
+        "zip_code",
+        "legal_business_name",
+        "tax_id",
+        "business_licence",
+        "files",
+        "created_at",
+        "updated_at"
+    ],
+    "categories": [
+        "id",
+        "name",
+        "asset_url",
+        "created_at",
+        "updated_at",
+        "category_type",
+        "description",
+        "status",
+        "tags"
+    ],
+    "order_items": [
+        "id",
+        "order_id",
+        "product_id",
+        "quantity",
+        "price"
+    ],
+    "products": [
+        "id",
+        "title",
+        "base_price",
+        "category_id",
+        "description",
+        "asset_url",
+        "created_at",
+        "updated_at",
+        "type",
+        "features",
+        "seo_keywords",
+        "tag",
+        "status",
+        "trend_type",
+        "discount_id",
+        "offer_id"
+    ],
+    "service_requests": [
+        "id",
+        "user_id",
+        "service_id",
+        "preferred_date",
+        "preferred_time",
+        "max_budget",
+        "special_instructions",
+        "has_tools",
+        "created_at",
+        "updated_at",
+        "address_id",
+        "status",
+        "bidding_scheduled_date",
+        "minimum_bid_amount",
+        "admin_notes",
+        "bidding_end_date"
+    ],
+    "inventory": [
+        "id",
+        "product_id",
+        "stock_quantity",
+        "reorder_level",
+        "sku"
+    ],
+    "wishlist": [
+        "user_id",
+        "product_id",
+        "type",
+        "quantity",
+        "created_at",
+        "updated_at"
+    ],
+    "bulk_product_prices": [
+        "id",
+        "product_id",
+        "quantity",
+        "discount_value",
+        "discount_type"
+    ],
+    "addresses": [
+        "id",
+        "user_id",
+        "street_address",
+        "apartment",
+        "city",
+        "state",
+        "zip_code",
+        "is_default",
+        "created_at",
+        "updated_at"
+    ],
+    "service_provider_services": [
+        "service_provider_id",
+        "service_id",
+        "created_at",
+        "updated_at"
+    ],
+    "service_provider_licences": [
+        "id",
+        "legal_business_name",
+        "tax_id",
+        "business_licence",
+        "files",
+        "created_at",
+        "updated_at",
+        "service_provider_id"
+    ],
+    "service_bids": [
+        "id",
+        "service_request_id",
+        "service_provider_id",
+        "amount",
+        "is_won",
+        "created_at",
+        "updated_at"
+    ],
+    "product_calculators": [
+        "id",
+        "product_id",
+        "calculation_type",
+        "unit",
+        "quantity_per_unit",
+        "wastage_percentage",
+        "created_at",
+        "updated_at"
+    ]
+}
