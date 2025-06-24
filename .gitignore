@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 .venv
 .env
 __pycache__/
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -47,4 +45,3 @@ poetry.lock
 
 # Logs
 *.log
->>>>>>> a15c829a1fdbb62b6b98a6029380910078133092
