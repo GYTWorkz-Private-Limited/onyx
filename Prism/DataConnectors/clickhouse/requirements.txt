@@ -1,0 +1,28 @@
+# ClickHouse DataConnector Dependencies
+
+# Core ClickHouse drivers (REQUIRED)
+clickhouse-driver>=0.2.6      # Native TCP protocol support
+clickhouse-connect>=0.6.0     # HTTP protocol with advanced features
+
+# HTTP client (REQUIRED)
+httpx>=0.25.0                 # Custom HTTP interface implementation
+
+# Configuration (REQUIRED)
+python-dotenv>=1.0.0          # Environment variable management
+
+# Compression support (RECOMMENDED)
+lz4>=4.3.0                    # LZ4 compression for ClickHouse
+zstandard>=0.21.0             # ZSTD compression for ClickHouse
+
+# Type hints (RECOMMENDED)
+typing-extensions>=4.7.0      # Enhanced type hints support
+
+# Testing dependencies (OPTIONAL - only install if running tests)
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+# pytest-benchmark>=4.0.0
+
+# Optional heavy dependencies (REMOVED - install separately if needed)
+# pandas>=2.0.0               # For data analysis workflows
+# numpy>=1.24.0               # For numerical computations
+# pyarrow>=12.0.0             # For Arrow format support

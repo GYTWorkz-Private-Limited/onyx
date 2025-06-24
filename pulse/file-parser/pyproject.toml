@@ -1,0 +1,98 @@
+[tool.poetry]
+name = "file-parser-api"
+version = "1.0.0"
+description = "A powerful document parsing service using Docling and LlamaParse"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+license = "MIT"
+keywords = ["document", "parsing", "api", "fastapi", "docling", "llamaparse"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: General",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+python-dotenv = "^1.0.0"
+pydantic = "^2.0.0"
+nest-asyncio = "*"
+docling = "^1.0.0"
+python-docx = "^1.1.0"
+pandas = "^2.0.0"
+openpyxl = "^3.1.0"
+python-pptx = "^0.6.0"
+llama-parse = "*"
+python-multipart = "^0.0.6"
+reportlab = "^4.4.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.0.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+mypy = "^1.5.0"
+
+[tool.poetry.scripts]
+file-parser = "server:main"
+
+[tool.poetry.urls]
+Homepage = "https://github.com/yourusername/file-parser-api"
+Documentation = "https://github.com/yourusername/file-parser-api#readme"
+Repository = "https://github.com/yourusername/file-parser-api.git"
+"Bug Tracker" = "https://github.com/yourusername/file-parser-api/issues"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["api", "controllers", "models", "services", "schemas", "utils"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+
