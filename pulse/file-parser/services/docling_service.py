@@ -9,6 +9,7 @@ from functools import lru_cache
 from .base_parser import BaseParser
 from models.parse_models import ParserConfig
 from utils.constants import SUPPORTED_EXTENSIONS
+from utils.logging_config import get_logger
 
 
 class DoclingService(BaseParser):
@@ -54,6 +55,7 @@ class DoclingService(BaseParser):
         super().__init__(config)
         self.converter = None  # Lazy initialization
         self._context_cache = {}  # Cache for context detection
+        self.logger = get_logger(__name__)
 
         # Performance optimization settings
         self.batch_size = getattr(config, 'batch_size', 5)
@@ -64,13 +66,37 @@ class DoclingService(BaseParser):
         self._memory_threshold = getattr(config, 'memory_threshold', 500)  # MB
 
     def _get_converter(self):
-        """Get or create DocumentConverter instance."""
+        """Get or create auto-optimized DocumentConverter instance."""
         if self.converter is None:
             try:
                 from docling.document_converter import DocumentConverter
+                from docling.datamodel.pipeline_options import PdfPipelineOptions
+                from docling.datamodel.base_models import InputFormat
+                from environment import Environment
+
+                # Auto-optimized pipeline options
+                pipeline_options = PdfPipelineOptions()
+
+                # Essential optimizations (auto-configured)
+                pipeline_options.do_ocr = True  # Required for document compatibility
+                pipeline_options.do_table_structure = True
+                pipeline_options.images_scale = Environment.IMAGE_SCALE
+                pipeline_options.generate_page_images = False
+
+                # Auto-configured GPU and batch settings
+                if hasattr(pipeline_options, 'ocr_options'):
+                    pipeline_options.ocr_options.use_gpu = Environment.ENABLE_GPU_ACCELERATION
+                    pipeline_options.ocr_options.batch_size = Environment.OCR_BATCH_SIZE
+
+                self.converter = DocumentConverter(
+                    format_options={InputFormat.PDF: pipeline_options}
+                )
+
+            except Exception:
+                # Simple fallback
+                from docling.document_converter import DocumentConverter
                 self.converter = DocumentConverter()
-            except Exception as e:
-                raise RuntimeError(f"Failed to initialize Docling DocumentConverter: {str(e)}")
+
         return self.converter
 
     def is_supported(self, file_path: str) -> bool:
@@ -100,13 +126,23 @@ class DoclingService(BaseParser):
             raise RuntimeError(f"Docling failed to parse {file_ext} file: {str(e)}")
 
     def _parse_pdf(self, file_path: str) -> Tuple[str, str]:
-        """Optimized PDF parsing using proven Docling approach."""
+        """High-performance PDF parsing."""
+        try:
+            # Use standard processing for all files
+            result = self._parse_pdf_standard(file_path)
+            return result
+
+        except Exception as e:
+            raise RuntimeError(f"Docling PDF parsing failed: {str(e)}")
+
+    def _parse_pdf_standard(self, file_path: str) -> Tuple[str, str]:
+        """Standard PDF parsing for smaller files."""
         try:
             # Import required Docling classes
             from docling.datamodel.document import DocumentConversionInput
             from pathlib import Path
 
-            # Get converter
+            # Get optimized converter
             converter = self._get_converter()
 
             # Create proper DocumentConversionInput object
@@ -138,28 +174,166 @@ class DoclingService(BaseParser):
             return text_content.strip(), markdown_content.strip()
 
         except Exception as e:
-            raise RuntimeError(f"Docling PDF parsing failed: {str(e)}")
+            raise RuntimeError(f"Standard PDF parsing failed: {str(e)}")
+
+
 
     def _extract_content_proven_method(self, conversion_result) -> Tuple[str, str]:
-        """Optimized content extraction method for maximum performance."""
+        """Optimized content extraction method with proper OCR text handling."""
         text_content = ""
         markdown_content = ""
 
-        # Method 1: Get markdown content (primary method)
-        if hasattr(conversion_result, 'render_as_markdown'):
-            markdown_content = conversion_result.render_as_markdown()
+        # Method 1: Extract content from document elements (NEW - handles OCR properly)
+        try:
+            # Access the document structure through the output attribute
+            document = None
 
-        # Method 2: Apply table structure fixes for financial documents
-        if markdown_content:
-            markdown_content = self._fix_table_structure(markdown_content)
+            # Check for output attribute (correct structure for Docling)
+            if hasattr(conversion_result, 'output') and conversion_result.output:
+                document = conversion_result.output
+                self.logger.debug("Using conversion_result.output", extra={
+                    "document_type": type(document).__name__
+                })
+            # Fallback: Check for direct document attribute
+            elif hasattr(conversion_result, 'document'):
+                document = conversion_result.document
+                self.logger.debug("Using conversion_result.document", extra={
+                    "document_type": type(document).__name__
+                })
+            # Fallback: Check if conversion_result itself has the document elements
+            elif hasattr(conversion_result, 'texts') and hasattr(conversion_result, 'pictures'):
+                document = conversion_result
+                self.logger.debug("Using conversion_result directly", extra={
+                    "document_type": type(document).__name__
+                })
+            else:
+                # Log available attributes for debugging
+                attrs = [attr for attr in dir(conversion_result) if not attr.startswith('_')]
+                self.logger.error("Could not find document structure in ConversionResult", extra={
+                    "has_output": hasattr(conversion_result, 'output'),
+                    "output_value": getattr(conversion_result, 'output', None),
+                    "available_attributes": attrs
+                })
+                raise AttributeError("Could not find document structure in ConversionResult")
 
-        # Method 3: Get text content
-        if hasattr(conversion_result, 'render_as_text'):
-            text_content = conversion_result.render_as_text()
+            text_content, markdown_content = self._extract_content_from_elements(document)
 
-        # Method 4: Fallback to markdown-to-text conversion if needed
-        if not text_content or len(text_content.strip()) < 500:
-            text_content = self._markdown_to_text(markdown_content)
+        except Exception as e:
+            # Log the error and fall back to standard rendering
+            self.logger.warning("Element extraction failed, using fallback method", extra={
+                "error": str(e),
+                "error_type": type(e).__name__
+            })
+            text_content = ""
+            markdown_content = ""
+
+        # Method 2: Fallback to standard rendering if element extraction fails
+        if not text_content or len(text_content.strip()) < 50:
+
+            # Get markdown content (fallback method)
+            if hasattr(conversion_result, 'render_as_markdown'):
+                markdown_content = conversion_result.render_as_markdown()
+
+            # Apply table structure fixes for financial documents
+            if markdown_content:
+                markdown_content = self._fix_table_structure(markdown_content)
+
+            # Get text content
+            if hasattr(conversion_result, 'render_as_text'):
+                text_content = conversion_result.render_as_text()
+
+            # Fallback to markdown-to-text conversion if needed
+            if not text_content or len(text_content.strip()) < 500:
+                text_content = self._markdown_to_text(markdown_content)
+
+        return text_content, markdown_content
+
+    def _extract_content_from_elements(self, document) -> Tuple[str, str]:
+        """Extract content directly from document elements, including OCR text from images."""
+        text_parts = []
+        markdown_parts = []
+
+        try:
+            # For ExportedCCSDocument, extract main_text content
+            if hasattr(document, 'main_text') and document.main_text:
+                for text_item in document.main_text:
+                    # Extract text content from main_text elements
+                    if hasattr(text_item, 'text') and text_item.text and text_item.text.strip():
+                        text_content = text_item.text.strip()
+                        text_parts.append(text_content)
+                        markdown_parts.append(text_content)
+                    # Some elements might have different text attributes
+                    elif hasattr(text_item, 'content') and text_item.content and text_item.content.strip():
+                        text_content = text_item.content.strip()
+                        text_parts.append(text_content)
+                        markdown_parts.append(text_content)
+
+            # Process figures (which may contain OCR text from images)
+            if hasattr(document, 'figures') and document.figures:
+                for figure_item in document.figures:
+                    # Extract OCR text from figures
+                    if hasattr(figure_item, 'text') and figure_item.text and figure_item.text.strip():
+                        ocr_text = figure_item.text.strip()
+                        text_parts.append(ocr_text)
+                        markdown_parts.append(ocr_text)
+
+                    # Check for caption or description
+                    elif hasattr(figure_item, 'caption') and figure_item.caption and figure_item.caption.strip():
+                        caption_text = figure_item.caption.strip()
+                        text_parts.append(caption_text)
+                        markdown_parts.append(caption_text)
+
+            # Process bitmaps (which may contain OCR text from images)
+            if hasattr(document, 'bitmaps') and document.bitmaps:
+                for bitmap_item in document.bitmaps:
+                    # Extract OCR text from bitmaps
+                    if hasattr(bitmap_item, 'text') and bitmap_item.text and bitmap_item.text.strip():
+                        ocr_text = bitmap_item.text.strip()
+                        text_parts.append(ocr_text)
+                        markdown_parts.append(ocr_text)
+
+            # Process all table elements
+            if hasattr(document, 'tables') and document.tables:
+                for table_item in document.tables:
+                    if hasattr(table_item, 'text') and table_item.text and table_item.text.strip():
+                        table_text = table_item.text.strip()
+                        text_parts.append(table_text)
+                        markdown_parts.append(table_text)
+                    # Tables might have different structure
+                    elif hasattr(table_item, 'content') and table_item.content:
+                        table_text = str(table_item.content).strip()
+                        if table_text:
+                            text_parts.append(table_text)
+                            markdown_parts.append(table_text)
+
+            # Fallback: try legacy structure for backward compatibility
+            if not text_parts:
+                # Process legacy text elements
+                if hasattr(document, 'texts'):
+                    for text_item in document.texts:
+                        if hasattr(text_item, 'text') and text_item.text and text_item.text.strip():
+                            text_content = text_item.text.strip()
+                            text_parts.append(text_content)
+                            markdown_parts.append(text_content)
+
+                # Process legacy picture elements
+                if hasattr(document, 'pictures'):
+                    for picture_item in document.pictures:
+                        if hasattr(picture_item, 'text') and picture_item.text and picture_item.text.strip():
+                            ocr_text = picture_item.text.strip()
+                            text_parts.append(ocr_text)
+                            markdown_parts.append(ocr_text)
+
+        except Exception as e:
+            self.logger.error("Error in element extraction", extra={
+                "error": str(e),
+                "error_type": type(e).__name__
+            })
+            raise
+
+        # Join all parts with appropriate separators
+        text_content = '\n\n'.join(text_parts)
+        markdown_content = '\n\n'.join(markdown_parts)
 
         return text_content, markdown_content
 

@@ -2,15 +2,35 @@
 
 import os
 from typing import Optional
-from dotenv import load_dotenv
 
-# Load environment variables from .env file in the same directory as this file
-_ENV_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
-load_dotenv(_ENV_FILE_PATH)
+# Try to load environment files with fallback hierarchy
+try:
+    from dotenv import load_dotenv
+    import os
+
+    _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    # Try to load .env first, then fallback to .env.example
+    _ENV_FILE_PATH = os.path.join(_BASE_DIR, '.env')
+    _ENV_EXAMPLE_PATH = os.path.join(_BASE_DIR, '.env.example')
+
+    if os.path.exists(_ENV_FILE_PATH):
+        load_dotenv(_ENV_FILE_PATH)
+        print(f"✅ Loaded configuration from .env")
+    elif os.path.exists(_ENV_EXAMPLE_PATH):
+        load_dotenv(_ENV_EXAMPLE_PATH)
+        print(f"✅ Loaded configuration from .env.example (fallback)")
+    else:
+        print(f"⚠️  No .env or .env.example file found, using system environment and defaults")
+
+except ImportError:
+    print(f"⚠️  dotenv not available, using system environment and defaults only")
+
+# Simple, reliable defaults that work well on most systems
 
 
 class Environment:
-    """Environment configuration class."""
+    """Environment configuration class with auto-detection."""
 
     # LlamaParse Configuration
     LLAMA_CLOUD_API_KEY: Optional[str] = os.getenv("LLAMA_CLOUD_API_KEY")
@@ -30,6 +50,14 @@ class Environment:
     # File Processing Configuration
     MAX_FILE_SIZE: int = int(os.getenv("MAX_FILE_SIZE", "50000000"))  # 50MB default
     SUPPORTED_EXTENSIONS: tuple = ('.pdf', '.docx', '.csv', '.xls', '.xlsx', '.pptx')
+
+    # Performance Configuration (CPU-optimized defaults - revised based on testing)
+    ENABLE_GPU_ACCELERATION: bool = os.getenv("ENABLE_GPU_ACCELERATION", "False").lower() == "true"
+    MAX_WORKERS: int = int(os.getenv("MAX_WORKERS", "6"))  # Revised: 6 workers for better parallelism (was 4)
+    OCR_BATCH_SIZE: int = int(os.getenv("OCR_BATCH_SIZE", "6"))  # Revised: 6 batch size for better CPU utilization (was 4)
+    IMAGE_SCALE: float = float(os.getenv("IMAGE_SCALE", "0.8"))  # Preserved: optimal quality vs speed balance
+    MEMORY_LIMIT_MB: int = int(os.getenv("MEMORY_LIMIT_MB", "4096"))  # Optimized: increased from 1024 to reduce GC overhead
+
 
     @classmethod
     def validate_llama_config(cls) -> bool:

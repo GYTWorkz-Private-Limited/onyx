@@ -11,6 +11,7 @@ from utils.file_validator import FileValidator
 from utils.output_writer import OutputWriter
 from schemas.parse_schemas import ParserEngine
 from utils.constants import PREVIEW_LENGTH
+from utils.logging_config import get_logger
 
 
 class ParseController:
@@ -20,6 +21,7 @@ class ParseController:
         """Initialize the parse controller."""
         self._docling_service = None
         self._llamaparse_service = None
+        self.logger = get_logger(__name__)
 
     @property
     def docling_service(self) -> DoclingService:
@@ -85,7 +87,11 @@ class ParseController:
                 raise RuntimeError(f"Temporary file was not created: {temp_path}")
 
             file_size = os.path.getsize(temp_path)
-            print(f"DEBUG: Uploaded file saved to {temp_path}, size: {file_size} bytes")
+            self.logger.info("File uploaded and saved", extra={
+                "filename": filename,
+                "temp_path": temp_path,
+                "file_size": file_size
+            })
 
             if file_size == 0:
                 raise RuntimeError(f"Uploaded file is empty: {temp_path}")
@@ -98,7 +104,10 @@ class ParseController:
             try:
                 with open(temp_path, 'rb') as test_file:
                     test_content = test_file.read(100)  # Read first 100 bytes
-                    print(f"DEBUG: File verification - can read {len(test_content)} bytes")
+                    self.logger.debug("File verification successful", extra={
+                        "filename": filename,
+                        "readable_bytes": len(test_content)
+                    })
             except Exception as e:
                 raise RuntimeError(f"Cannot read temporary file: {e}")
 
@@ -106,14 +115,27 @@ class ParseController:
             parser_service = self.get_parser_service(engine)
 
             # Parse the file
-            print(f"DEBUG: Parsing file {temp_path} with engine {engine}")
+            self.logger.info("Starting file parsing", extra={
+                "filename": filename,
+                "engine": engine.value,
+                "temp_path": temp_path
+            })
             result = parser_service.parse_to_result(temp_path, filename)
-            print(f"DEBUG: Parse result success: {result.success}")
-            print(f"DEBUG: Text length: {len(result.text) if result.text else 0}")
-            print(f"DEBUG: Markdown length: {len(result.markdown) if result.markdown else 0}")
+
+            self.logger.info("File parsing completed", extra={
+                "filename": filename,
+                "engine": engine.value,
+                "success": result.success,
+                "text_length": len(result.text) if result.text else 0,
+                "markdown_length": len(result.markdown) if result.markdown else 0
+            })
 
             if not result.success:
-                print(f"DEBUG: Parse failed with error: {result.error_message}")
+                self.logger.error("File parsing failed", extra={
+                    "filename": filename,
+                    "engine": engine.value,
+                    "error_message": result.error_message
+                })
                 raise HTTPException(
                     status_code=500,
                     detail=f"Parsing failed: {result.error_message}"
@@ -121,14 +143,20 @@ class ParseController:
 
             # Check for empty content even if parsing was "successful"
             if not result.text or not result.text.strip():
-                print(f"DEBUG: Parse returned empty text content!")
+                self.logger.error("Parsing returned empty text content", extra={
+                    "filename": filename,
+                    "engine": engine.value
+                })
                 raise HTTPException(
                     status_code=500,
                     detail="Parsing succeeded but returned empty text content"
                 )
 
             if not result.markdown or not result.markdown.strip():
-                print(f"DEBUG: Parse returned empty markdown content!")
+                self.logger.error("Parsing returned empty markdown content", extra={
+                    "filename": filename,
+                    "engine": engine.value
+                })
                 raise HTTPException(
                     status_code=500,
                     detail="Parsing succeeded but returned empty markdown content"
